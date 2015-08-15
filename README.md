@@ -67,7 +67,7 @@ TEMPLATES = [
 ```
 > This is only a recommendation since the Django documentation is not that clear about how to do this and people have many different ways of approaching this.
 
-## Implementation
+## Rendering via Templates
 
 At the top of your template:
 ```
@@ -87,6 +87,23 @@ Do it like this:
 <img src="{{MEDIA_ROOT}}{{image|style:"Small Thumbnail"}}">
 ...
 ```
+## Rendering images via URL
+
+To add this feature you need to add the path to the ´my_project/urls.py´ file like so:
+
+```
+...
+    url(r'^image_styles/', include('image_styles.urls')),
+...
+```
+Now you can use `http://localhost:8000/image_styles/<style id>/<path to your image>` to load images with a URL. This feature is VERY useful when dealing with APIs and trying to retreive the correct styled and sized image to a mobile app.
+This can also be used in a template like this:
+```
+...
+<img src="{% url 'render_image' 1 image.name %}">
+...
+```
+Where `1` is the style id and `image` is a `django.models.ImageField` object.
 
 ## Default Styles
 
@@ -106,24 +123,6 @@ To crate a style you need to follow the next steps:
 * To call it in your template just add the filter `{% load image_styles_filters %}` and render it as `{{MEDIA_ROOT}}{{image|style:"My Custom Style"}}`.
 
 If the style is modified in any way, it will be resetted and the new images will be re-rendered when needed.
-
-## Rendering images via URL
-
-To add this feature you need to add the path to the ´my_project/urls.py´ file like so:
-
-```
-...
-    url(r'^image_styles/', include('image_styles.urls')),
-...
-```
-Now you can use `http://localhost:8000/image_styles/<style id>/<path to your image>` to load images with a URL. This feature is VERY useful when dealing with APIs and trying to retreive the correct styled and sized image to a mobile app.
-This can also be used in a template like this:
-```
-...
-<img src="{% url 'render_image' 1 image.name %}">
-...
-```
-Where `1` is the style id and `image` is a `django.models.ImageField` object.
 
 ## Limitations
 
