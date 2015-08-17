@@ -67,7 +67,7 @@ TEMPLATES = [
 ```
 > This is only a recommendation since the Django documentation is not that clear about how to do this and people have many different ways of approaching this.
 
-## Rendering via Templates
+## Rendering images via Templates
 
 At the top of your template:
 ```
@@ -102,6 +102,22 @@ This can also be used in a template like this:
 ...
 <img src="{% url 'render_image' 1 image.name %}">
 ...
+```
+Where `1` is the style id and `image` is a `django.models.ImageField` object.
+
+## Rendering images via Views
+
+This is useful when outputting images for API resources.
+
+Import the *reverse* function at the top of the `views.py` file.
+```
+...
+from django.core.urlresolvers import reverse
+...
+```
+Finally you can get the image like so:
+```
+rendered_image = reverse('render_image',[1,image.name])
 ```
 Where `1` is the style id and `image` is a `django.models.ImageField` object.
 
