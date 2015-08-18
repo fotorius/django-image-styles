@@ -131,14 +131,13 @@ The module includes 4 simple styles:
 
 This styles can be edited at any time if you like.
 
-## Creating/Editing your styles
+## Manage your styles
 
 To crate a style you need to follow the next steps:
-* If you have your admin interface activated go to `http://localhost:8000/admin/image_styles/style/` and create a new style.
-* Then you can add effects by going to `http://localhost:8000/admin/image_styles/` and either add a *Crop*, *Enhance*, *Resize*, *Rotate* or *Scale* effect. The "weight" parameter allows for the effects to be applied on a certian order, the "heavier" the "later" they are applied.
-* To call it in your template just add the filter `{% load image_styles_filters %}` and render it as `{{MEDIA_ROOT}}{{image|style:"My Custom Style"}}`.
+* As shown in the **Rendering images via URL** section, you need to add the `url(r'^image_styles/', include('image_styles.urls')),` path to your root `urls.py` file.
+* To access the image styles admin interface simply go to `http://localhost:8000/admin/image_styles/`.
 
-If the style is modified in any way, it will be resetted and the new images will be re-rendered when needed.
+If a style is modified in any way, it will be resetted and the new images will be re-rendered when needed.
 
 ## Limitations
 
