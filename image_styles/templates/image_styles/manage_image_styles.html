@@ -1,0 +1,257 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Manage Image Styles</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  <style>
+h2 > a.edit-style, h2 > a.add-effect{
+  font-size: 15px!important;
+  margin-top: 13px;    
+  cursor: pointer;
+}
+h2 a{
+  color: transparent;
+  padding: 5px;
+}
+h2 > a.add-effect{
+  color: rgb(51, 122, 183)!important;   
+}
+h2 > span.style-name{
+  color: #333!important;
+}
+h2:hover{
+  background-color: #f8f8f8;
+}
+h2:hover a{
+  color: #333;
+  text-decoration: none;
+}
+div.effect{
+  background-color: #f8f8f8;
+  border: #e7e7e7 solid 1px;
+  padding: 2px 8px;
+  margin: 5px 0;
+}
+div.effect .edit-effect{
+  color: transparent;
+}
+div.effect:hover .edit-effect{
+  color: #333;
+}
+.move-effect{
+  cursor:move;    
+}
+.edit-effect{
+  cursor:pointer;
+}
+.effects{
+  position: relative;
+  z-index:1;
+}
+.loading{
+  display: none;
+  background-color: rgba(255,255,255,0.7); 
+  position: absolute;
+  top:0;
+  bottom:0;
+  left:0;
+  right:0;
+  z-index:2;
+}
+.loading.active{
+  display: inherit;
+}
+ul.errorlist li{
+  list-style-type:none;
+  color: #d43f3a;
+}
+  </style>
+  </head>
+  <body>
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="{% url 'manage_image_styles' %}">Image Styles</a>
+    </div><!-- ./navbar-header -->
+    <div class="collapse navbar-collapse">  
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="{% url 'style' %}" class="add-style toggle-generic-modal"><span class="glyphicon glyphicon-plus" data-toggle="tooltip" data-placement="bottom" title="Add Style"></span> Add Style</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+      <div class="container">
+{% for s in styles %}
+    <div class="row"><div class="col-sm-6 col-sm-offset-3">
+      <h2><span class="style-name">{{s.style.name}}</span><a href="{% url 'style' s.style.id %}" class="edit-style glyphicon glyphicon-pencil toggle-generic-modal" data-toggle="tooltip" data-placement="top" title="Edit Style"></a><a href="{% url 'effect_form' s.style.id %}" class="glyphicon glyphicon-plus add-effect pull-right toggle-generic-modal" data-toggle="tooltip" data-placement="top" title="Add Effect"></a></h2>
+    </div></div><!-- /.col-md-6.col-md-offset-3 --><!-- /.row -->
+    <div class="row effects"><div class="loading"></div><div class="col-sm-6 col-sm-offset-3 sortable">
+  {% for effect in s.effects %}
+    <div class="effect"> <span class="glyphicon glyphicon-move move-effect" aria-hidden="true"></span>&nbsp;{{effect.name}}<span class="glyphicon glyphicon-pencil edit-effect pull-right" aria-hidden="true"></span>
+    <form action="{% url "effect_form" effect.object.id %}" method="POST" class="hidden effect-form">
+      {% csrf_token %}
+      <table class="table">
+      {{effect.form.as_table}}
+      <tr>
+          <td><input type="submit" class="btn btn-danger delete-effect" name="delete" value="Delete"></td>
+          <td><input type="submit" class="btn btn-primary pull-right save-effect" value="Save"></td>
+      </tr>
+      </table>
+    </form>
+    </div>
+  {% endfor %}
+    </div></div><!-- /.col-md-6.col-md-offset-3 --><!-- /.row -->
+{% endfor %}
+    </div><!-- /.container -->
+
+  <!-- Modal -->
+  <div class="modal fade" id="generic-modal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Loading...</h4>
+        </div>
+        <div class="modal-body">
+          <p>...</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div><!-- /.modal -->
+ 
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script>
+/* AJAX CSRF Support */
+// https://docs.djangoproject.com/en/1.8/ref/csrf/
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+
+// https://docs.djangoproject.com/en/1.7/ref/contrib/csrf/
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+var csrftoken = getCookie('csrftoken');
+
+
+var save_counter = 0;
+
+$('.sortable').sortable({
+  handle: '.move-effect',
+  stop: function( event, ui ) {
+    var weight=0;
+    $(this).parent().find('form #id_weight').each(function(){
+      $(this).val(weight);
+      weight++;
+      save_counter++;
+    });
+    $(this).parent().find('form .save-effect').trigger( "click" );
+  }
+});
+
+$('.edit-effect').on('click',function(){
+  $(this).parent().find('form').toggleClass('hidden');    
+});
+$( ".effect-form" ).submit(function( event ) {
+  event.preventDefault();
+  var button = $("input[type=submit]:focus");
+  var effect = $("input[type=submit]:focus").closest('.effect');
+  var effects = effect.closest('.effects');
+  var loading = $('.loading');
+  var del = $("input[type=submit][name=delete]:focus").length ? "&delete=Delete" : "";
+  loading.addClass('active');
+  if($("input[type=submit]:focus").length) save_counter = 1;
+  else console.log(save_counter);
+  $.ajax({ 
+    data: $(this).serialize()+del,
+    type: $(this).attr('method'), 
+    url: $(this).attr('action'), 
+    success: function(response) {
+      save_counter=save_counter-1;
+      if(save_counter==0) loading.removeClass('active');
+      if(del != ''){
+        effect.remove();
+      }else{
+        $(this).html(response);
+      }
+    }
+  });
+});
+
+function format_modal_form(){
+  $('#generic-modal form input[type=text]').addClass("form-control");
+  $('#generic-modal form input[type=number]').addClass("form-control");
+  $('#generic-modal form select').addClass("form-control");
+  $('#generic-modal').modal('show');
+  $("#generic-modal form").submit(function(event) {
+    event.preventDefault();
+    var del = $("input[type=submit][name=delete]:focus").length ? "&delete=Delete" : "";
+    $.ajax({ 
+      data: $(this).serialize()+del,
+      type: $(this).attr('method'), 
+      url: $(this).attr('action'), 
+      success: function(response,status,xhr) {
+        $('#generic-modal .modal-dialog').html(response);
+        $('#generic-modal form input[type=text]').addClass("form-control");
+        $('#generic-modal form input[type=number]').addClass("form-control");
+        $('#generic-modal form select').addClass("form-control");
+        if(!$('#generic-modal .modal-dialog form').length){
+          location.reload();
+        }else{
+          format_modal_form(); 
+        }
+      }
+    });
+  });
+}
+
+$('.toggle-generic-modal').on('click', function(e){
+  e.preventDefault();
+  e.preventDefault();
+  $('#generic-modal').removeData('bs.modal');
+  $('#generic-modal .modal-dialog').load($(this).attr('href'),function(response, status, xhr){
+    format_modal_form(); 
+  });
+});
+
+    </script>
+  </body>
+</html>

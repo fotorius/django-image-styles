@@ -2,7 +2,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from PIL import Image,ImageEnhance # PIL
-import os
+import os,re
 
 def get_upload_file_name(instance,filename):
     return "image_styles/%s/%s" % (instance.style.id,filename)
@@ -20,9 +20,15 @@ class Style(models.Model):
         for effect_object in effect_objects:
             es = effect_object.objects.filter(style=self)
             for e in es:
+                re_type = re.match(r"<class '\w+.models.(\w+)'>",str(type(e)))
+                if len(re_type.groups()) == 1:
+                    name = re_type.group(1)
+                else:
+                    name = ''
                 effects.append({
                     'weight':e.weight,
-                    'object':e
+                    'object':e,
+                    'name':name,
                  })
         effects = sorted(effects, key=lambda k: k['weight'])
         return effects
