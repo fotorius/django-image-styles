@@ -137,7 +137,7 @@ To crate a style you need to follow the next steps:
 * As shown in the **Rendering images via URL** section, you need to add the `url(r'^image_styles/', include('image_styles.urls')),` path to your root `urls.py` file.
 * To access the image styles admin interface simply go to `http://localhost:8000/image_styles/`.
 
-If a style is modified in any way, it will be resetted and the new images will be re-rendered when needed.
+If a style is modified in any way, it will be resetted and the new images will be re-rendered when needed. The admin site is **only available for staff users**.
 
 ## Limitations
 
