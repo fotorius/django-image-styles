@@ -44,6 +44,7 @@ You are done! :)
 Just to ensure a proper server configuration, if you are prototyping using Django's `runserver`, be sure to add the following lines to your `my_project/urls.py` file as described in the [Django 1.8 documentation](https://docs.djangoproject.com/en/1.8/howto/static-files/):
 ```
 ...
+from django.conf.urls.static import static
 from django.conf import settings
 ...
 urlpatterns = [
