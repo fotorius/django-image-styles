@@ -51,7 +51,7 @@ urlpatterns = [
    ...
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 ```
-It is also recommended to add the `django.core.context_processors.media` context processor to the template settings in the  `my_project/settings.py` file to be able to use the `{{MEDIA_URL}}` tag in your templates:
+It is also recommended to add the `'django.template.context_processors.media'` context processor to the template settings in the  `my_project/settings.py` file to be able to use the `{{MEDIA_URL}}` tag in your templates:
 ```
 TEMPLATES = [
     {
@@ -60,7 +60,7 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 ...
-                'django.core.context_processors.media',
+                'django.template.context_processors.media',
             ]
         }
     }
