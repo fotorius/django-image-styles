@@ -79,13 +79,13 @@ At the top of your template:
 And now, instead of rendering the original images like so:
 ```
 ...
-<img src="{{MEDIA_ROOT}}{{image}}">
+<img src="{{MEDIA_URL}}{{image}}">
 ...
 ```
 Do it like this:
 ```
 ...
-<img src="{{MEDIA_ROOT}}{{image|style:"Small Thumbnail"}}">
+<img src="{{MEDIA_URL}}{{image|style:"Small Thumbnail"}}">
 ...
 ```
 ## Rendering images via URL
