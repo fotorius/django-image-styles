@@ -122,10 +122,10 @@ class ImageStyle(models.Model):
                     width = effect['object'].width
 
                 if effect['object'].allow_upscale:
-                    im = im.resize((width,height))
+                    im = im.resize((width,height),effect['object'].mode)
                 else:
                     if w > width and h > height:
-                        im = im.resize((width,height))
+                        im = im.resize((width,height),effect['object'].mode)
 
         
         im.save(self.image.path)
@@ -250,6 +250,13 @@ class Rotate(models.Model):
         return self.style.name  
 
 class Scale(models.Model):
+    MODES = (
+        (Image.NEAREST,'Nearest'),
+        (Image.ANTIALIAS,'Antialias'),
+        (Image.BILINEAR,'Bilinear'),
+        (Image.BICUBIC,'Bicubic'),
+    )
+    mode = models.PositiveSmallIntegerField(choices=MODES,default=1)
     width = models.IntegerField(blank=True,null=True)
     height = models.IntegerField(blank=True,null=True)
     allow_upscale = models.BooleanField(default=True)
