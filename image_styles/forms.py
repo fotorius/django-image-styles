@@ -65,7 +65,7 @@ class ScaleForm(forms.ModelForm):
     )
     class Meta:
         model = Scale
-        fields = ['style','height','width','allow_upscale','weight']
+        fields = ['style','height','width','allow_upscale','weight','mode']
         widgets = {
             'style':forms.HiddenInput,
             'weight':forms.HiddenInput,
