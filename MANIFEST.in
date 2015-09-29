@@ -1,0 +1,4 @@
+include LICENSE
+include README.rst
+recursive-include image_styles/static *
+recursive-include image_styles/templates *
