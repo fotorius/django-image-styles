@@ -73,7 +73,7 @@ TEMPLATES = [
 At the top of your template:
 ```
 ...
-{% load image_styles_filters %}
+{% load image_styles %}
 ...
 ```
 And now, instead of rendering the original images like so:
