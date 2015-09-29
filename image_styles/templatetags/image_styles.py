@@ -1,7 +1,7 @@
 from django import template
 from django.conf import settings
 import shutil,os
-from image_styles.models import *
+from ..models import *
 
 register = template.Library()
 
