@@ -12,14 +12,18 @@ Simple, fast and easy-to-use tool for pre-rendering images on Django.
   - Rotate
   - Scale Proportionally
 - Render via **Template** or **URL**
+- Effect Management Utility
 
 ## Installation
 
 Apply to an existing django project:
 ```
 git clone https://github.com/devalfrz/django-image-styles # Download the latest version
-mv django-image-styles/image_styles .
-rm -r django-image-styles
+cd django-image-styles
+python setup.py install
+cd ..
+# If you want pre-installed effects in your database
+python manage.py loaddata django-image-styles/image_styles/image_styles-init.json
 ```
 Add to installed apps in your project `settings.py` and the MEDIA settings:
 ```
