@@ -132,7 +132,6 @@ ul.errorlist li{
       
     </div>
   </div><!-- /.modal -->
- 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
@@ -172,7 +171,6 @@ function getCookie(name) {
 var csrftoken = getCookie('csrftoken');
 
 
-var save_counter = 0;
 
 $('.sortable').sortable({
   handle: '.move-effect',
@@ -181,36 +179,48 @@ $('.sortable').sortable({
     $(this).parent().find('form #id_weight').each(function(){
       $(this).val(weight);
       weight++;
-      save_counter++;
     });
     $(this).parent().find('form .save-effect').trigger( "click" );
+    $(this).find('.effect').addClass('moved');
   }
 });
 
 $('.edit-effect').on('click',function(){
   $(this).parent().find('form').toggleClass('hidden');    
 });
-$( ".effect-form" ).submit(function( event ) {
+
+var submit_name = '';
+$('input[type="submit"]').click(function(e){
+  e.preventDefault();
+  submit_name = ($(this).attr('name')) ? $(this).attr('name') : '';
+  $(this).closest('form').submit();
+});
+
+$(".effect-form").submit(function( event ) {
   event.preventDefault();
-  var button = $("input[type=submit]:focus");
-  var effect = $("input[type=submit]:focus").closest('.effect');
+  var effect = $(this).closest('.effect');
   var effects = effect.closest('.effects');
   var loading = $('.loading');
-  var del = $("input[type=submit][name=delete]:focus").length ? "&delete=Delete" : "";
+  var del = submit_name == 'delete' ? '&delete=Delete' : '';
+  submit_name = '';
   loading.addClass('active');
-  if($("input[type=submit]:focus").length) save_counter = 1;
-  else console.log(save_counter);
+  console.log($(this).serialize()+del);
   $.ajax({ 
     data: $(this).serialize()+del,
     type: $(this).attr('method'), 
     url: $(this).attr('action'), 
     success: function(response) {
-      save_counter=save_counter-1;
-      if(save_counter==0) loading.removeClass('active');
+      effect.removeClass('moved');
+      if(!$('.effect.moved').length) loading.removeClass('active');
       if(del != ''){
         effect.remove();
       }else{
         $(this).html(response);
+        $(this).find('input[type=submit]').click(function(e){
+          e.preventDefault();
+          submit_name = ($(this).attr('name')) ? $(this).attr('name') : '';
+          $(this).closest('form').submit();
+        });
       }
     }
   });
@@ -220,10 +230,16 @@ function format_modal_form(){
   $('#generic-modal form input[type=text]').addClass("form-control");
   $('#generic-modal form input[type=number]').addClass("form-control");
   $('#generic-modal form select').addClass("form-control");
+  $('#generic-modal form input[type=submit]').click(function(e){
+    e.preventDefault();
+    submit_name = ($(this).attr('name')) ? $(this).attr('name') : '';
+    $(this).closest('form').submit();
+  });
   $('#generic-modal').modal('show');
   $("#generic-modal form").submit(function(event) {
     event.preventDefault();
-    var del = $("input[type=submit][name=delete]:focus").length ? "&delete=Delete" : "";
+    var del = submit_name == 'delete' ? '&delete=Delete' : '';
+    submit_name = '';
     $.ajax({ 
       data: $(this).serialize()+del,
       type: $(this).attr('method'), 
@@ -242,7 +258,6 @@ function format_modal_form(){
     });
   });
 }
-
 $('.toggle-generic-modal').on('click', function(e){
   e.preventDefault();
   e.preventDefault();
@@ -251,7 +266,6 @@ $('.toggle-generic-modal').on('click', function(e){
     format_modal_form(); 
   });
 });
-
     </script>
   </body>
 </html>
