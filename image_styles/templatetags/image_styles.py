@@ -1,7 +1,7 @@
 from django import template
 from django.conf import settings
 import shutil,os
-from ..models import *
+from image_styles.models import *
 
 register = template.Library()
 
@@ -15,5 +15,8 @@ def style(orig_image,style_name):
         image = ImageStyle.objects.get(name=orig_image.name,style=style)
     except ImageStyle.DoesNotExist:
         image = ImageStyle(name=orig_image.name,style=style)
-        image.save()
+        try:
+            image.save()
+        except IOError:
+            return orig_image
     return "%s" % (image.image,)
