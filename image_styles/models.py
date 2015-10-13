@@ -16,7 +16,7 @@ class Style(models.Model):
 
     def get_effects(self):
         effects = []
-        effect_objects = [Crop,Enhance,Resize,Rotate,Scale]
+        effect_objects = [Crop,Enhance,Resize,Rotate,Scale,SmartScale]
         for effect_object in effect_objects:
             es = effect_object.objects.filter(style=self)
             for e in es:
@@ -120,6 +120,22 @@ class ImageStyle(models.Model):
                 else:
                     height = effect['object'].height
                     width = effect['object'].width
+
+                if effect['object'].allow_upscale:
+                    im = im.resize((width,height),effect['object'].mode)
+                else:
+                    if w > width and h > height:
+                        im = im.resize((width,height),effect['object'].mode)
+            elif type(effect['object']) is SmartScale:
+                w, h = im.size
+                im_prop = float(h)/float(w)
+
+                if im_prop < 1.0:
+                    width = effect['object'].width
+                    height = int(float(h)/w*width)
+                else:
+                    height = effect['object'].height
+                    width = int(float(w)/h*height)
 
                 if effect['object'].allow_upscale:
                     im = im.resize((width,height),effect['object'].mode)
@@ -280,3 +296,35 @@ class Scale(models.Model):
     def __unicode__(self):
         return self.style.name  
 
+
+
+class SmartScale(models.Model):
+    MODES = (
+        (Image.NEAREST,'Nearest'),
+        (Image.ANTIALIAS,'Antialias'),
+        (Image.BILINEAR,'Bilinear'),
+        (Image.BICUBIC,'Bicubic'),
+    )
+    mode = models.PositiveSmallIntegerField(choices=MODES,default=1)
+    width = models.IntegerField()
+    height = models.IntegerField()
+    allow_upscale = models.BooleanField(default=True)
+
+    style = models.ForeignKey(Style)
+    weight = models.IntegerField(default=0)
+
+    def save(self,*args,**kwargs):
+        if not self.id and self.weight == 0:
+            es = self.style.get_effects()[::-1]
+            if len(es) is not 0:
+                self.weight = es[0]['weight']+1
+        sv = super(SmartScale,self).save(*args,**kwargs)
+        self.style.delete_images()
+        return sv
+
+    def delete(self,*args,**kwargs):
+        self.style.delete_images()
+        super(SmartScale,self).delete(*args,**kwargs)
+
+    def __unicode__(self):
+        return self.style.name  
