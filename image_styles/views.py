@@ -37,6 +37,8 @@ def manage_image_styles(request):
                 effects[i]['form'] = RotateForm(instance=effects[i]['object'])
             elif type(effects[i]['object']) == type(Scale()):
                 effects[i]['form'] = ScaleForm(instance=effects[i]['object'])
+            elif type(effects[i]['object']) == type(SmartScale()):
+                effects[i]['form'] = SmartScaleForm(instance=effects[i]['object'])
 
         ims.append({
             'style':s,
@@ -124,6 +126,8 @@ def effect_form(request,effect_id=None):
                         form = RotateForm(initial={'style':style,'effect':'rotate'})
                     elif effect_form.cleaned_data['create_effect'] == 'scale':
                         form = ScaleForm(initial={'style':style,'effect':'scale'})
+                    elif effect_form.cleaned_data['create_effect'] == 'smart_scale':
+                        form = SmartScaleForm(initial={'style':style,'effect':'smart_scale'})
                     else:
                         raise Http404("Not Found 1")
 
@@ -145,6 +149,8 @@ def effect_form(request,effect_id=None):
                     form = RotateForm(request.POST)
                 elif request.POST['effect'] == 'scale':
                     form = ScaleForm(request.POST)
+                elif request.POST['effect'] == 'smart_scale':
+                    form = SmartScaleForm(request.POST)
                 else:
                     raise Http404("Not Found 2")
 
@@ -170,6 +176,8 @@ def effect_form(request,effect_id=None):
                 form = RotateForm(request.POST,instance=get_object_or_404(Rotate,pk=effect_id))
             elif request.POST['effect'] == 'scale':
                 form = ScaleForm(request.POST,instance=get_object_or_404(Scale,pk=effect_id))
+            elif request.POST['effect'] == 'smart_scale':
+                form = SmartScaleForm(request.POST,instance=get_object_or_404(SmartScale,pk=effect_id))
             else:
                 raise Http404("Not Found 4")
             if form.is_valid():
@@ -189,6 +197,9 @@ def effect_form(request,effect_id=None):
                     elif request.POST['effect'] == 'scale':
                         get_object_or_404(Scale,pk=effect_id).delete()
                         return HttpResponse('Deleted') 
+                    elif request.POST['effect'] == 'smart_scale':
+                        get_object_or_404(SmartScale,pk=effect_id).delete()
+                        return HttpResponse('Deleted') 
                     else:
                         raise Http404("Not Found 5")
                 
@@ -201,4 +212,3 @@ def effect_form(request,effect_id=None):
                'delete':'Delete',
             } 
             return  render(request,'image_styles/generic_form.html',c)
-
