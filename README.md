@@ -24,8 +24,6 @@ git clone https://github.com/devalfrz/django-image-styles # Download the latest 
 cd django-image-styles
 python setup.py install
 cd ..
-# If you want pre-installed effects in your database
-python manage.py loaddata django-image-styles/image_styles/image_styles-init.json
 ```
 Add to installed apps in your project `settings.py` and the MEDIA settings:
 ```
@@ -40,8 +38,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 ```
 Run migrations and the initial data of the module.
 ```
-$ python manage.py migrate
-$ python manage.py loaddata image_styles/image_styles-init.json
+python manage.py migrate
+# If you want pre-installed effects in your database
+python manage.py loaddata django-image-styles/image_styles/fixtures/0001_initial.json
 ```
 You are done! :)
 
@@ -82,20 +81,20 @@ At the top of your template:
 ...
 {% load image_styles %}
 ...
-```
-And now, instead of rendering the original images like so:
-```
-...
-<img src="{{MEDIA_URL}}{{image}}" alt="Image Description">
-...
-```
-Do it like this:
+
+### Method 1
 ```
 ...
-{% render_image image 'Small Thumbnail' %}
+{% render_image image 'Small Thumbnail' 'Optional Image Description' %}
 ...
 ```
-This can also be done more explicitly by writing it like this:
+Or you can simply add the ID of the format:
+```
+...
+{% render_image image 1 %}
+...
+```
+### Method 2
 ```
 ...
 <img src="{{MEDIA_URL}}{{image|style:'Small Thumbnail'}}" alt="Image Description">
