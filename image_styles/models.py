@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.conf import settings
-from PIL import Image,ImageEnhance # PIL
+from PIL import Image,ImageEnhance,ImageDraw # PIL
 import os,re
 
 def get_upload_file_name(instance,filename):
@@ -16,7 +16,7 @@ class Style(models.Model):
 
     def get_effects(self):
         effects = []
-        effect_objects = [Crop,Enhance,Resize,Rotate,Scale,SmartScale]
+        effect_objects = [Crop,Enhance,Resize,Rotate,Scale,SmartScale,RoundCorners]
         for effect_object in effect_objects:
             es = effect_object.objects.filter(style=self)
             for e in es:
@@ -34,7 +34,7 @@ class Style(models.Model):
         return effects
 
     def __unicode__(self):
-        return self.name
+        return '%d: %s' % (self.id,self.name)
 
 class ImageStyle(models.Model):
     name = models.CharField(max_length=511)
@@ -142,7 +142,17 @@ class ImageStyle(models.Model):
                 else:
                     if w > width and h > height:
                         im = im.resize((width,height),effect['object'].mode)
-
+            elif type(effect['object']) is RoundCorners:
+                circle = Image.new('L', (effect['object'].radius * 2, effect['object'].radius * 2), 0)
+                draw = ImageDraw.Draw(circle)
+                draw.ellipse((0, 0, effect['object'].radius * 2, effect['object'].radius * 2), fill=255)
+                alpha = Image.new('L', im.size, "white")
+                w, h = im.size
+                alpha.paste(circle.crop((0, 0, effect['object'].radius, effect['object'].radius)), (0, 0))
+                alpha.paste(circle.crop((0, effect['object'].radius, effect['object'].radius, effect['object'].radius * 2)), (0, h - effect['object'].radius))
+                alpha.paste(circle.crop((effect['object'].radius, 0, effect['object'].radius * 2, effect['object'].radius)), (w - effect['object'].radius, 0))
+                alpha.paste(circle.crop((effect['object'].radius, effect['object'].radius, effect['object'].radius * 2, effect['object'].radius * 2)), (w - effect['object'].radius, h - effect['object'].radius))
+                im.putalpha(alpha)
         
         im.save(self.image.path)
         
@@ -242,6 +252,27 @@ class Resize(models.Model):
     def __unicode__(self):
         return self.style.name  
 
+class RoundCorners(models.Model):
+    radius = models.IntegerField()
+    style = models.ForeignKey(Style)
+    weight = models.IntegerField(default=0)
+
+    def save(self,*args,**kwargs):
+        if not self.id and self.weight == 0:
+            es = self.style.get_effects()[::-1]
+            if len(es) is not 0:
+                self.weight = es[0]['weight']+1
+        sv = super(RoundCorners,self).save(*args,**kwargs)
+        self.style.delete_images()
+        return sv
+    
+    def delete(self,*args,**kwargs):
+        self.style.delete_images()
+        super(RoundCorners,self).delete(*args,**kwargs)
+
+    def __unicode__(self):
+        return self.style.name  
+
 class Rotate(models.Model):
     ANGLES = zip( range(90,360,90), range(90,360,90) )
     angle = models.IntegerField(choices=ANGLES,default=0)
@@ -328,3 +359,4 @@ class SmartScale(models.Model):
 
     def __unicode__(self):
         return self.style.name  
+

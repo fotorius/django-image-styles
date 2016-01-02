@@ -1,22 +1,23 @@
 from django import template
+from django.utils.safestring import mark_safe
 from django.conf import settings
 import shutil,os
-from image_styles.models import *
+from django.core.exceptions import MultipleObjectsReturned
+from ..models import *
+from ..utils import style as image_style
 
 register = template.Library()
 
 @register.filter
 def style(orig_image,style_name):
+    return image_style(orig_image,style_name)
+
+@register.simple_tag
+def render_image(orig_image,style_name,alt='image'):
     try:
-        style = Style.objects.get(name=style_name)
-    except Style.DoesNotExist:
-        return orig_image
-    try:
-        image = ImageStyle.objects.get(name=orig_image.name,style=style)
-    except ImageStyle.DoesNotExist:
-        image = ImageStyle(name=orig_image.name,style=style)
-        try:
-            image.save()
-        except IOError:
-            return orig_image
-    return "%s" % (image.image,)
+        src = settings.MEDIA_URL+image_style(orig_image,style_name)
+        return mark_safe('<img src="%s"alt="%s">' % (src,alt))
+    except IOError:
+        pass
+    return ''
+

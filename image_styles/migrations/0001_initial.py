@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models, migrations
+from django.db import migrations, models
 import image_styles.models
 
 
@@ -58,11 +58,31 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
+            name='RoundCorners',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('radius', models.IntegerField()),
+                ('weight', models.IntegerField(default=0)),
+            ],
+        ),
+        migrations.CreateModel(
             name='Scale',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('mode', models.PositiveSmallIntegerField(default=1, choices=[(0, b'Nearest'), (1, b'Antialias'), (2, b'Bilinear'), (3, b'Bicubic')])),
                 ('width', models.IntegerField(null=True, blank=True)),
                 ('height', models.IntegerField(null=True, blank=True)),
+                ('allow_upscale', models.BooleanField(default=True)),
+                ('weight', models.IntegerField(default=0)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='SmartScale',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('mode', models.PositiveSmallIntegerField(default=1, choices=[(0, b'Nearest'), (1, b'Antialias'), (2, b'Bilinear'), (3, b'Bicubic')])),
+                ('width', models.IntegerField()),
+                ('height', models.IntegerField()),
                 ('allow_upscale', models.BooleanField(default=True)),
                 ('weight', models.IntegerField(default=0)),
             ],
@@ -75,7 +95,17 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.AddField(
+            model_name='smartscale',
+            name='style',
+            field=models.ForeignKey(to='image_styles.Style'),
+        ),
+        migrations.AddField(
             model_name='scale',
+            name='style',
+            field=models.ForeignKey(to='image_styles.Style'),
+        ),
+        migrations.AddField(
+            model_name='roundcorners',
             name='style',
             field=models.ForeignKey(to='image_styles.Style'),
         ),

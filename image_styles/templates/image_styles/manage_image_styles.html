@@ -91,7 +91,7 @@ ul.errorlist li{
       <div class="container">
 {% for s in styles %}
     <div class="row"><div class="col-sm-6 col-sm-offset-3">
-      <h2><span class="style-name">{{s.style.id}}. {{s.style.name}}</span><a href="{% url 'style' s.style.id %}" class="edit-style glyphicon glyphicon-pencil toggle-generic-modal" data-toggle="tooltip" data-placement="top" title="Edit Style"></a><a href="{% url 'effect_form' s.style.id %}" class="glyphicon glyphicon-plus add-effect pull-right toggle-generic-modal" data-toggle="tooltip" data-placement="top" title="Add Effect"></a></h2>
+      <h2><span class="style-name">{{s.style}}</span><a href="{% url 'style' s.style.id %}" class="edit-style glyphicon glyphicon-pencil toggle-generic-modal" data-toggle="tooltip" data-placement="top" title="Edit Style"></a><a href="{% url 'effect_form' s.style.id %}" class="glyphicon glyphicon-plus add-effect pull-right toggle-generic-modal" data-toggle="tooltip" data-placement="top" title="Add Effect"></a></h2>
     </div></div><!-- /.col-md-6.col-md-offset-3 --><!-- /.row -->
     <div class="row effects"><div class="loading"></div><div class="col-sm-6 col-sm-offset-3 sortable">
   {% for effect in s.effects %}

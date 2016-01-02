@@ -11,7 +11,9 @@ Simple, fast and easy-to-use tool for pre-rendering images on Django.
   - Resize
   - Rotate
   - Scale Proportionally
-- Render via **Template** or **URL**
+  - Scale by width or height (Smart Scale)
+  - Round Corners
+- Render in **Templates** or via **URL**
 - Effect Management Utility
 
 ## Installation
@@ -49,6 +51,7 @@ Just to ensure a proper server configuration, if you are prototyping using Djang
 ```
 ...
 from django.conf.urls.static import static
+from django.conf.urls import include
 from django.conf import settings
 ...
 urlpatterns = [
@@ -83,13 +86,19 @@ At the top of your template:
 And now, instead of rendering the original images like so:
 ```
 ...
-<img src="{{MEDIA_URL}}{{image}}">
+<img src="{{MEDIA_URL}}{{image}}" alt="Image Description">
 ...
 ```
 Do it like this:
 ```
 ...
-<img src="{{MEDIA_URL}}{{image|style:"Small Thumbnail"}}">
+{% render_image image 'Small Thumbnail' %}
+...
+```
+This can also be done more explicitly by writing it like this:
+```
+...
+<img src="{{MEDIA_URL}}{{image|style:'Small Thumbnail'}}" alt="Image Description">
 ...
 ```
 ## Rendering images via URL
@@ -147,3 +156,4 @@ If a style is modified in any way, it will be resetted and the new images will b
 ## Limitations
 
 - Since the system has no way of telling if the original images have been deleted or modified, the rendered images can still be shown if the right url is called. The way of preventing this (and the *correct* thing to do) is to rename the file if the image object has changed.
+- Images with no alpha channels may be filled with a black background.

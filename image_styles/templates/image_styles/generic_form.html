@@ -4,7 +4,7 @@
 {{form.as_table}}
 <tr>
     <td>{% if delete %}<input type="submit" class="btn btn-danger" name="delete" value="{{delete}}">{% endif %}</td>
-    <td><input type="submit" class="btn btn-primary pull-right" value="{% if button_ok %}{{button_ok}}{% else %}Save{% endif %}"></td>
+    <td><input type="submit" class="btn btn-primary pull-right" name="sumbit" value="{% if button_ok %}{{button_ok}}{% else %}Save{% endif %}"></td>
 </tr>
 </table>
 </form>

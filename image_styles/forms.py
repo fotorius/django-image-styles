@@ -7,9 +7,23 @@ EFFECT_CHOICES = (
   ('enhance','Enhance'),
   ('resize','Resize'),
   ('rotate','Rotate'),
+  ('round-corners','Round Corners'),
   ('scale','Scale'),
+  ('smart-scale','Smart Scale'),
 )
 
+class RoundCornersForm(forms.ModelForm):
+    effect = forms.CharField(
+      widget=forms.HiddenInput(),
+      initial='round-corners',
+    )
+    class Meta:
+        model = RoundCorners
+        fields = ['style','radius','weight']
+        widgets = {
+            'style':forms.HiddenInput,
+            'weight':forms.HiddenInput,
+        }
 class CropForm(forms.ModelForm):
     effect = forms.CharField(
       widget=forms.HiddenInput(),
@@ -65,6 +79,18 @@ class ScaleForm(forms.ModelForm):
     )
     class Meta:
         model = Scale
+        fields = ['style','height','width','allow_upscale','weight','mode']
+        widgets = {
+            'style':forms.HiddenInput,
+            'weight':forms.HiddenInput,
+        }
+class SmartScaleForm(forms.ModelForm):
+    effect = forms.CharField(
+      widget=forms.HiddenInput(),
+      initial='smart-scale',
+    )
+    class Meta:
+        model = SmartScale
         fields = ['style','height','width','allow_upscale','weight','mode']
         widgets = {
             'style':forms.HiddenInput,
