@@ -45,9 +45,6 @@ def get_package_data(package):
 version = get_version('image_styles')
 
 if sys.argv[-1] == 'publish':
-    print("Publishing not configured")
-    sys.exit()
-    """
     if os.system("pip freeze | grep wheel"):
         print("wheel not installed.\nUse `pip install wheel`.\nExiting.")
         sys.exit()
@@ -63,13 +60,12 @@ if sys.argv[-1] == 'publish':
     shutil.rmtree('build')
     shutil.rmtree('djangoimagestyles.egg-info')
     sys.exit()
-    """
 
 
 setup(
     name='djangoimagestyles',
     version=version,
-    url='https://git.behuns.com/django-image-styles',
+    url='https://github.com/devalfrz/django-image-styles',
     license='BSD',
     description='Django image formatting tool.',
     author='Alfredo Rius',
