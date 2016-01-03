@@ -36,8 +36,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 Run migrations and the initial data of the module.
 ```
 python manage.py migrate
-# If you want pre-installed effects in your database
-python manage.py loaddata django-image-styles/image_styles/fixtures/0001_initial.json
 ```
 You are done! :)
 
