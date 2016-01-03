@@ -72,6 +72,7 @@ setup(
     author_email='alfredo.rius@behuns.com',
     packages=get_packages('image_styles'),
     package_data=get_package_data('image_styles'),
+    include_package_data=True,
     install_requires=[],
     zip_safe=False,
     classifiers=[
