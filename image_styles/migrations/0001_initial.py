@@ -4,6 +4,12 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import image_styles.models
 
+from django.core.management import call_command
+
+fixture = '0001_initial.json'
+
+def load_fixture(apps, schema_editor):
+    call_command('loaddata', fixture, app_label='image_styles') 
 
 class Migration(migrations.Migration):
 
@@ -134,4 +140,5 @@ class Migration(migrations.Migration):
             name='style',
             field=models.ForeignKey(to='image_styles.Style'),
         ),
+        migrations.RunPython(load_fixture),
     ]
