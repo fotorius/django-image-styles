@@ -98,7 +98,7 @@ Or you can simply add the ID of the format:
 ### Method 2
 ```
 ...
-&lt;img src="{{MEDIA_URL}}{{image|style:'Small Thumbnail'}}" alt="Image Description"&gt;
+<img src="{{MEDIA_URL}}{{image|style:'Small Thumbnail'}}" alt="Image Description">
 ...
 ```
 ## Rendering images via URL
@@ -110,11 +110,11 @@ To add this feature you need to add the path to the ´my_project/urls.py´ file 
     url(r'^image_styles/', include('image_styles.urls')),
 ...
 ```
-Now you can use `http://localhost:8000/image_styles/&lt;style id&gt;/&lt;path to your image&gt;` to load images with a URL. This feature is VERY useful when dealing with APIs and trying to retreive the correct styled and sized image to a mobile app.
+Now you can use `http://localhost:8000/image_styles/<style id>/<path to your image>` to load images with a URL. This feature is VERY useful when dealing with APIs and trying to retreive the correct styled and sized image to a mobile app.
 This can also be used in a template like this:
 ```
 ...
-&lt;img src="{% url 'render_image' 1 image.name %}"&gt;
+<img src="{% url 'render_image' 1 image.name %}">
 ...
 ```
 Where `1` is the style id and `image` is a `django.models.ImageField` object.
