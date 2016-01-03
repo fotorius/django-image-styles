@@ -82,6 +82,7 @@ At the top of your template:
 {% load image_styles %}
 ...
 
+```
 ### Method 1
 ```
 ...
