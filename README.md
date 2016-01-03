@@ -20,10 +20,7 @@ Simple, fast and easy-to-use tool for pre-rendering images on Django.
 
 Apply to an existing django project:
 ```
-git clone https://github.com/devalfrz/django-image-styles # Download the latest version
-cd django-image-styles
-python setup.py install
-cd ..
+pip install djangoimagestyles
 ```
 Add to installed apps in your project `settings.py` and the MEDIA settings:
 ```
