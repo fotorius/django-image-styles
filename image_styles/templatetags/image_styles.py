@@ -21,3 +21,14 @@ def render_image(orig_image,style_name,alt='image'):
         pass
     return ''
 
+@register.filter
+def valid_image_extension(image):
+    """
+    Evaluates if the image has a valid "image" extension.
+    """
+    VALID_EXTENSIONS = ('.jpg','.png','.jpeg')
+    name, extension = os.path.splitext(image.name)
+    if extension.lower() in VALID_EXTENSIONS:
+        return True
+    return False
+
