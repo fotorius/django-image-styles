@@ -33,4 +33,16 @@ def style(orig_image,style_name):
 
     return "%s" % (image.image,)
 
+def render_image(style_id,path):
+    try:
+        style = Style.objects.get(id=style_id)
+    except Style.DoesNotExist:
+        raise Http404("Style not found")
+    try:
+        image = ImageStyle.objects.get(name=path,style=style)
+    except ImageStyle.DoesNotExist:
+        image = ImageStyle(name=path,style=style)
+        image.save()
+
+    return image
 

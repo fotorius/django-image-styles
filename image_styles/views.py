@@ -7,19 +7,13 @@ import mimetypes
 
 from models import *
 from forms import * 
+import utils as image_styles_utils
 
 def render_image(request,style_id,path):
-    try:
-        style = Style.objects.get(id=style_id)
-    except Style.DoesNotExist:
-        raise Http404("Style not found")
-    try:
-        image = ImageStyle.objects.get(name=path,style=style)
-    except ImageStyle.DoesNotExist:
-        image = ImageStyle(name=path,style=style)
-        image.save()
+    # render image
+    image = image_styles_utils.render_image(style_id,path)
     content_type = mimetypes.guess_type(image.image.path)
-    return HttpResponse(image.image,content_type=content_type[0])
+    return HttpResponse(image.image.name,content_type=content_type[0])
 
 @staff_member_required
 def manage_image_styles(request):

@@ -122,11 +122,13 @@ Import the *reverse* function at the top of the `views.py` file.
 ```
 ...
 from django.core.urlresolvers import reverse
+from image_styles import utils
 ...
 ```
 Finally you can get the image like so:
 ```
-rendered_image = reverse('render_image',[1,image.name])
+rendered_image = render_image(1,image.name)
+image_url = reverse('render_image',kwargs{'style_id':1,'path':image.name})
 ```
 Where `1` is the style id and `image` is a `django.models.ImageField` object.
 
