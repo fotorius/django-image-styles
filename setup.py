@@ -73,7 +73,7 @@ setup(
     packages=get_packages('image_styles'),
     package_data=get_package_data('image_styles'),
     include_package_data=True,
-    install_requires=[],
+    install_requires=['pillow',],
     zip_safe=False,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
