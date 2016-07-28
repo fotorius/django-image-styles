@@ -18,6 +18,11 @@ Simple, fast and easy-to-use tool for pre-rendering images on Django.
 
 ## Installation
 
+If you haven't install libjpeg-dev:
+```
+sudo apt-get install libjpeg-dev
+```
+
 Apply to an existing django project:
 ```
 pip install djangoimagestyles
