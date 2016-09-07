@@ -102,8 +102,12 @@ class ImageStyle(models.Model):
                     sharpness = 0
                 else:
                     sharpness = float(effect['object'].sharpness+100)/100
-                converter = ImageEnhance.Sharpness(im)
+                try:
+                    converter = ImageEnhance.Sharpness(im)
+                except ValueError:
+                    converter = ImageEnhance.Sharpness(im.convert('RGBA'))
                 im = converter.enhance(sharpness)
+                    
 
             elif type(effect['object']) is Resize:
                 im = im.resize((effect['object'].width,effect['object'].height))
