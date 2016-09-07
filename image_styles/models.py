@@ -45,6 +45,7 @@ class ImageStyle(models.Model):
 
     def apply_effects(self,effects):
         im = Image.open(os.path.join(settings.MEDIA_ROOT,self.name))
+        im = im.convert('RGBA')
         for effect in effects:
             if type(effect['object']) is Crop:
                 w, h = im.size
@@ -102,10 +103,8 @@ class ImageStyle(models.Model):
                     sharpness = 0
                 else:
                     sharpness = float(effect['object'].sharpness+100)/100
-                try:
-                    converter = ImageEnhance.Sharpness(im)
-                except ValueError:
-                    converter = ImageEnhance.Sharpness(im.convert('RGBA'))
+               
+                converter = ImageEnhance.Sharpness(im)
                 im = converter.enhance(sharpness)
                     
 
