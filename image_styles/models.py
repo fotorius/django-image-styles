@@ -36,6 +36,9 @@ class Style(models.Model):
     def __unicode__(self):
         return '%d: %s' % (self.id,self.name)
 
+    class Meta:
+        ordering = ['id']
+
 class ImageStyle(models.Model):
     name = models.CharField(max_length=511)
     style = models.ForeignKey(Style)
