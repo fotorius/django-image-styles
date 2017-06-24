@@ -1,5 +1,6 @@
 from django.conf import settings
 import shutil,os
+from django.core.urlresolvers import reverse
 from django.core.exceptions import MultipleObjectsReturned
 from models import *
 
@@ -43,6 +44,24 @@ def render_image(style_id,path):
     except ImageStyle.DoesNotExist:
         image = ImageStyle(name=path,style=style)
         image.save()
+    except ImageStyle.MultipleObjectsReturned:
+        images = ImageStyle.objects.filter(name=path,style=style).order_by('-id')
+        image = images.first()
+        images.exclude(id=image.id)
+        images.delete()
 
     return image
+
+def get_image(image_name,style_id):
+    if not image_name:
+        return None
+    rendered_image = render_image(style_id,image_name)
+    image_url = settings.MEDIA_URL[:-1]+reverse(
+        'render_image',
+        kwargs={
+            'style_id':style_id,
+            'path':image_name
+        }
+    )
+    return image_url
 
