@@ -160,7 +160,15 @@ class ImageStyle(models.Model):
                 alpha.paste(circle.crop((effect['object'].radius, effect['object'].radius, effect['object'].radius * 2, effect['object'].radius * 2)), (w - effect['object'].radius, h - effect['object'].radius))
                 im.putalpha(alpha)
         
-        im.save(self.image.path)
+        try:
+            im.save(self.image.path)
+        except IOError:
+            # Not the most elegant way to handle RGBA jpgs, but works
+            background = Image.new("RGB", im.size, (255, 255, 255))
+            background.paste(im, mask=im.split()[3])
+            im = background
+            im.save(self.image.path)
+
         
     def save(self,*args,**kwargs):
         if self.id is None:
