@@ -1,6 +1,6 @@
 from django import forms
 
-from models import *
+from .models import *
 
 EFFECT_CHOICES = (
   ('crop','Crop'),

@@ -33,7 +33,7 @@ class Style(models.Model):
         effects = sorted(effects, key=lambda k: k['weight'])
         return effects
 
-    def __unicode__(self):
+    def __str__(self):
         return '%d: %s' % (self.id,self.name)
 
     class Meta:
@@ -43,7 +43,7 @@ class ImageStyle(models.Model):
     name = models.CharField(max_length=511)
     style = models.ForeignKey(Style)
     image = models.ImageField(upload_to=get_upload_file_name,null=True,blank=True)
-    def __unicode__(self):
+    def __str__(self):
         return "%s - %s" % (self.style.name,self.name)
 
     def apply_effects(self,effects):

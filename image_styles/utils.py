@@ -2,7 +2,7 @@ from django.conf import settings
 import shutil,os
 from django.core.urlresolvers import reverse
 from django.core.exceptions import MultipleObjectsReturned
-from models import *
+from .models import *
 
 def style(orig_image,style_name):
     try:

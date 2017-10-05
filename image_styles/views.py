@@ -5,9 +5,9 @@ from django.core.urlresolvers import reverse
 
 import mimetypes
 
-from models import *
-from forms import * 
-import utils as image_styles_utils
+from .models import *
+from .forms import * 
+from . import utils as image_styles_utils
 
 def render_image(request,style_id,path):
     # render image
