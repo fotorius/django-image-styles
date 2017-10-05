@@ -69,7 +69,6 @@ def style(request,style_id=None):
             form = StyleForm()
         else:
             form = StyleForm(instance=get_object_or_404(Style,pk=style_id))
-            print('Print something')
 
     if style_id is not None:
         style = get_object_or_404(Style,pk=style_id)
