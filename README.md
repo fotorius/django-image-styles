@@ -137,7 +137,7 @@ rendered_image = render_image(1,image.name)
 image_url = settings.MEDIA_URL[:-1]+reverse(
     'render_image',
     kwargs={
-        'style_id':1,
+        'style_name':'thumbnail',
         'path':image.name
     }
 )

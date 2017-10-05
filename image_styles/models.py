@@ -5,11 +5,11 @@ from PIL import Image,ImageEnhance,ImageDraw # PIL
 import os,re
 
 def get_upload_file_name(instance,filename):
-    return "image_styles/%s/%s" % (instance.style.id,filename)
+    return "image_styles/%s/%s" % (instance.style.name,filename)
 
 
 class Style(models.Model):
-    name = models.CharField(max_length=127)
+    name = models.SlugField(max_length=127,unique=True)
     
     def delete_images(self):
         ImageStyle.objects.filter(style=self).delete()

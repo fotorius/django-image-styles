@@ -9,9 +9,9 @@ from .models import *
 from .forms import * 
 from . import utils as image_styles_utils
 
-def render_image(request,style_id,path):
+def render_image(request,style_name,path):
     # render image
-    image = image_styles_utils.render_image(style_id,path)
+    image = image_styles_utils.render_image(style_name,path)
     content_type = mimetypes.guess_type(image.image.path)
     return HttpResponse(image.image.name,content_type=content_type[0])
 
@@ -69,6 +69,7 @@ def style(request,style_id=None):
             form = StyleForm()
         else:
             form = StyleForm(instance=get_object_or_404(Style,pk=style_id))
+            print('Print something')
 
     if style_id is not None:
         style = get_object_or_404(Style,pk=style_id)

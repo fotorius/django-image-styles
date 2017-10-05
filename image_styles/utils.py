@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.http import Http404
 import shutil,os
 from django.core.urlresolvers import reverse
 from django.core.exceptions import MultipleObjectsReturned
@@ -34,9 +35,12 @@ def style(orig_image,style_name):
 
     return "%s" % (image.image,)
 
-def render_image(style_id,path):
+def render_image(style_name,path):
     try:
-        style = Style.objects.get(id=style_id)
+        if type(style_name) is int:
+            style = Style.objects.get(id=style_name)
+        else:
+            style = Style.objects.get(name=style_name)
     except Style.DoesNotExist:
         raise Http404("Style not found")
     try:
@@ -52,14 +56,14 @@ def render_image(style_id,path):
 
     return image
 
-def get_image(image_name,style_id):
+def get_image(image_name,style_name):
     if not image_name:
         return None
-    rendered_image = render_image(style_id,image_name)
+    rendered_image = render_image(style_name,image_name)
     image_url = settings.MEDIA_URL[:-1]+reverse(
         'render_image',
         kwargs={
-            'style_id':style_id,
+            'style_name':style_name,
             'path':image_name
         }
     )
