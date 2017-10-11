@@ -47,8 +47,31 @@ class ImageStyle(models.Model):
         return "%s - %s" % (self.style.name,self.name)
 
     def apply_effects(self,effects):
-        im = Image.open(os.path.join(settings.MEDIA_ROOT,self.name))
-        im = im.convert('RGBA')
+        orig = Image.open(os.path.join(settings.MEDIA_ROOT,self.name))
+        if orig.mode != 'RGBA':
+          orig = orig.convert('RGBA')
+
+        # Fix orientation
+        orientation = False
+        try:
+            exif=dict((ExifTags.TAGS[k], v) for k, v in orig._getexif().items() if k in ExifTags.TAGS)
+            if exif.get('Orientation') == 8:
+                orig=orig.rotate(90, expand=True)
+                orientation = True
+            if exif.get('Orientation') == 6:
+                orig=orig.rotate(270, expand=True)
+                orientation = True
+        except AttributeError:
+            pass # No EXIF
+
+        # Handle transparency
+        if orientation:
+            size = orig.size
+        else:
+            size = orig.size
+        im = Image.new('RGBA', orig.size, (0,0,0,0))
+        im.paste(orig)
+
         for effect in effects:
             if type(effect['object']) is Crop:
                 w, h = im.size
@@ -136,7 +159,7 @@ class ImageStyle(models.Model):
                 w, h = im.size
                 im_prop = float(h)/float(w)
 
-                if im_prop < 1.0:
+                if im_prop > 1.0:
                     width = effect['object'].width
                     height = int(float(h)/w*width)
                 else:
