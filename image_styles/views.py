@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404
 from django.http import Http404
 from django.contrib.admin.views.decorators import staff_member_required
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 import mimetypes
 

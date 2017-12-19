@@ -41,7 +41,7 @@ class Style(models.Model):
 
 class ImageStyle(models.Model):
     name = models.CharField(max_length=511)
-    style = models.ForeignKey(Style)
+    style = models.ForeignKey(Style,on_delete=models.CASCADE)
     image = models.ImageField(upload_to=get_upload_file_name,null=True,blank=True)
     def __str__(self):
         return "%s - %s" % (self.style.name,self.name)
@@ -217,7 +217,7 @@ class Crop(models.Model):
     width = models.IntegerField()
     height = models.IntegerField()
     anchor = models.IntegerField(choices=ANCHORS,default=5)
-    style = models.ForeignKey(Style)
+    style = models.ForeignKey(Style,on_delete=models.CASCADE)
     weight = models.IntegerField(default=0)
     
     def save(self,*args,**kwargs):
@@ -247,7 +247,7 @@ class Enhance(models.Model):
     color = models.IntegerField(choices=COLORS,default=0)
     sharpness = models.IntegerField(choices=SHARPNESSES,default=0)
 
-    style = models.ForeignKey(Style)
+    style = models.ForeignKey(Style,on_delete=models.CASCADE)
     weight = models.IntegerField(default=0)
     
     def save(self,*args,**kwargs):
@@ -270,7 +270,7 @@ class Resize(models.Model):
     width = models.IntegerField()
     height = models.IntegerField()
 
-    style = models.ForeignKey(Style)
+    style = models.ForeignKey(Style,on_delete=models.CASCADE)
     weight = models.IntegerField(default=0)
 
     def save(self,*args,**kwargs):
@@ -291,7 +291,7 @@ class Resize(models.Model):
 
 class RoundCorners(models.Model):
     radius = models.IntegerField()
-    style = models.ForeignKey(Style)
+    style = models.ForeignKey(Style,on_delete=models.CASCADE)
     weight = models.IntegerField(default=0)
 
     def save(self,*args,**kwargs):
@@ -314,7 +314,7 @@ class Rotate(models.Model):
     ANGLES = zip( range(90,360,90), range(90,360,90) )
     angle = models.IntegerField(choices=ANGLES,default=0)
 
-    style = models.ForeignKey(Style)
+    style = models.ForeignKey(Style,on_delete=models.CASCADE)
     weight = models.IntegerField(default=0)
 
     def save(self,*args,**kwargs):
@@ -345,7 +345,7 @@ class Scale(models.Model):
     height = models.IntegerField(blank=True,null=True)
     allow_upscale = models.BooleanField(default=True)
 
-    style = models.ForeignKey(Style)
+    style = models.ForeignKey(Style,on_delete=models.CASCADE)
     weight = models.IntegerField(default=0)
 
     def save(self,*args,**kwargs):
@@ -378,7 +378,7 @@ class SmartScale(models.Model):
     height = models.IntegerField()
     allow_upscale = models.BooleanField(default=True)
 
-    style = models.ForeignKey(Style)
+    style = models.ForeignKey(Style,on_delete=models.CASCADE)
     weight = models.IntegerField(default=0)
 
     def save(self,*args,**kwargs):
