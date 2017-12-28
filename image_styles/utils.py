@@ -24,14 +24,12 @@ def style(orig_image,style_name):
     try:
         image = ImageStyle.objects.get(name=orig_image_name,style=style)
     except ImageStyle.DoesNotExist:
-        image = ImageStyle(name=orig_image_name,style=style)
+        image = ImageStyle.objects.create(name=orig_image_name,style=style)
     except MultipleObjectsReturned:
         images = ImageStyle.objects.filter(name=orig_image_name,style=style)
         for i in images:
             i.delete()
-        image = ImageStyle(name=orig_image_name,style=style)
-
-    image.save()
+        image = ImageStyle.objects.create(name=orig_image_name,style=style)
 
     return "%s" % (image.image,)
 
