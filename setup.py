@@ -58,18 +58,18 @@ if sys.argv[-1] == 'publish':
     print("  git push --tags")
     shutil.rmtree('dist')
     shutil.rmtree('build')
-    shutil.rmtree('djangoimagestyles.egg-info')
+    shutil.rmtree('django-image-styles.egg-info')
     sys.exit()
 
 
 setup(
-    name='djangoimagestyles',
+    name='django-image-styles',
     version=version,
     url='https://github.com/devalfrz/django-image-styles',
     license='BSD',
     description='Django image formatting tool.',
     author='Alfredo Rius',
-    author_email='alfredo.rius@behuns.com',
+    author_email='alfredo.rius@gmail.com',
     packages=get_packages('image_styles'),
     package_data=get_package_data('image_styles'),
     include_package_data=True,
