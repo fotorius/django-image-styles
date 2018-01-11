@@ -33,7 +33,7 @@ Apply to an existing django project:
 
 ::
 
-    pip install djangoimagestyles
+    pip install django-image-styles
 
 Add to installed apps in your project ``settings.py`` and the MEDIA
 settings:
