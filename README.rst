@@ -23,12 +23,39 @@ Features
 Installation
 ------------
 
-Apply to an existing django project: ``pip install djangoimagestyles``
+If you haven't install libjpeg-dev:
+
+::
+
+    sudo apt-get install libjpeg-dev
+
+Apply to an existing django project:
+
+::
+
+    pip install djangoimagestyles
+
 Add to installed apps in your project ``settings.py`` and the MEDIA
 settings:
-``INSTALLED_APPS = (     ...     image_styles,     ... ) ... MEDIA_URL = '/media/' MEDIA_ROOT = os.path.join(BASE_DIR,'media')``
+
+::
+
+    INSTALLED_APPS = (
+        ...
+        image_styles,
+        ...
+    )
+    ...
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+
 Run migrations and the initial data of the module.
-``python manage.py migrate`` You are done! :)
+
+::
+
+    python manage.py migrate
+
+You are done! :)
 
 Recommendations
 ---------------
@@ -36,40 +63,106 @@ Recommendations
 Just to ensure a proper server configuration, if you are prototyping
 using Django's ``runserver``, be sure to add the following lines to your
 ``my_project/urls.py`` file as described in the `Django 1.8
-documentation <https://docs.djangoproject.com/en/1.8/howto/static-files/>`_:
-``... from django.conf.urls.static import static from django.conf.urls import include from django.conf import settings ... urlpatterns = [    ... ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)``
+documentation <https://docs.djangoproject.com/en/1.8/howto/static-files/>`__:
+
+::
+
+    ...
+    from django.conf.urls.static import static
+    from django.conf.urls import include
+    from django.conf import settings
+    ...
+    urlpatterns = [
+       ...
+    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 It is also recommended to add the
 ``'django.template.context_processors.media'`` context processor to the
 template settings in the ``my_project/settings.py`` file to be able to
 use the ``{{MEDIA_URL}}`` tag in your templates:
-``TEMPLATES = [     {         'BACKEND': 'django.template.backends.django.DjangoTemplates',         ...         'OPTIONS': {             'context_processors': [                 ...                 'django.template.context_processors.media',             ]         }     } ]``
-> This is only a recommendation since the Django documentation is not
-that clear about how to do this and people have many different ways of
-approaching this.
+
+::
+
+    TEMPLATES = [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            ...
+            'OPTIONS': {
+                'context_processors': [
+                    ...
+                    'django.template.context_processors.media',
+                ]
+            }
+        }
+    ]
+
+    This is only a recommendation since the Django documentation is not
+    that clear about how to do this and people have many different ways
+    of approaching this.
 
 Rendering images via Templates
 ------------------------------
 
-At the top of your template: \`\`\` ... {% load image\_styles %} ...
+At the top of your template:
 
-``### Method 1`` ... {% render\_image image 'Small Thumbnail' 'Optional
-Image Description' %} ...
-``Or you can simply add the ID of the format:`` ... {% render\_image
-image 1 %} ... ``### Method 2`` ... ... \`\`\` ## Rendering images via
-URL
+::
+
+    ...
+    {% load image_styles %}
+    ...
+
+Method 1
+~~~~~~~~
+
+::
+
+    ...
+    {% render_image image 'Small Thumbnail' 'Optional Image Description' %}
+    ...
+
+Or you can simply add the ID of the format:
+
+::
+
+    ...
+    {% render_image image 1 %}
+    ...
+
+Method 2
+~~~~~~~~
+
+::
+
+    ...
+    <img src="{{MEDIA_URL}}{{image|style:'Small Thumbnail'}}" alt="Image Description">
+    ...
+
+Rendering images via URL
+------------------------
 
 To add this feature you need to add the path to the
 ´my\_project/urls.py´ file like so:
 
-``...     url(r'^image_styles/', include('image_styles.urls')), ...``
+::
+
+    ...
+        url(r'^image_styles/', include('image_styles.urls')),
+    ...
+
 Now you can use
 ``http://localhost:8000/image_styles/<style id>/<path to your image>``
 to load images with a URL. This feature is VERY useful when dealing with
 APIs and trying to retreive the correct styled and sized image to a
 mobile app. This can also be used in a template like this:
-``... <img src="{% url 'render_image' 1 image.name %}"> ...`` Where
-``1`` is the style id and ``image`` is a ``django.models.ImageField``
-object.
+
+::
+
+    ...
+    <img src="{% url 'render_image' 1 image.name %}">
+    ...
+
+Where ``1`` is the style id and ``image`` is a
+``django.models.ImageField`` object.
 
 Rendering images via Views
 --------------------------
@@ -77,10 +170,30 @@ Rendering images via Views
 This is useful when outputting images for API resources.
 
 Import the *reverse* function at the top of the ``views.py`` file.
-``... from django.core.urlresolvers import reverse ...`` Finally you can
-get the image like so:
-``rendered_image = reverse('render_image',[1,image.name])`` Where ``1``
-is the style id and ``image`` is a ``django.models.ImageField`` object.
+
+::
+
+    ...
+    from django.core.urlresolvers import reverse
+    from image_styles.utils import render_image
+    from django.conf import settings
+    ...
+
+Finally you can get the image like so:
+
+::
+
+    rendered_image = render_image(1,image.name)
+    image_url = settings.MEDIA_URL[:-1]+reverse(
+        'render_image',
+        kwargs={
+            'style_name':'thumbnail',
+            'path':image.name
+        }
+    )
+
+Where ``1`` is the style id and ``image`` is a
+``django.models.ImageField`` object.
 
 Default Styles
 --------------
