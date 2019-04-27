@@ -72,12 +72,12 @@ def style(request,style_id=None):
 
     if style_id is not None:
         style = get_object_or_404(Style,pk=style_id)
-        action = reverse('style',kwargs={'style_id':style_id})
+        action = reverse('image_styles:style',kwargs={'style_id':style_id})
         button_ok = 'Save'
         title = 'Edit Style: %s' % (style.name)
         delete = 'Delete'
     else:
-        action = reverse('style')
+        action = reverse('image_styles:style')
         button_ok = 'Create'
         title = 'Create Style'
         delete = None
@@ -99,7 +99,7 @@ def effect_form(request,effect_id=None):
             'form':EffectForm(
                 initial={'style':style.id}
              ),
-             'action':reverse('effect_form'),
+             'action':reverse('image_styles:effect_form'),
              'button_ok':'Create',
              'title':'New effect for %s' % (style.name),
          }
@@ -131,7 +131,7 @@ def effect_form(request,effect_id=None):
 
                 c = {
                      'form':form,
-                     'action':reverse('effect_form'),
+                     'action':reverse('image_styles:effect_form'),
                      'button_ok':'Create',
                      'title':'New effect for %s' % (style.name),
                  }
@@ -159,7 +159,7 @@ def effect_form(request,effect_id=None):
                     return HttpResponse("Effect Created!")
                 c = {
                      'form':form,
-                     'action':reverse('effect_form'),
+                     'action':reverse('image_styles:effect_form'),
                      'button_ok':'Create',
                      'title':'New effect',
                  }
@@ -213,7 +213,7 @@ def effect_form(request,effect_id=None):
        
             c = {
                'form': form, 
-               'action':reverse('effect_form',kwargs={'effect_id':effect_id}),
+               'action':reverse('image_styles:effect_form',kwargs={'effect_id':effect_id}),
                'delete':'Delete',
             } 
             return  render(request,'image_styles/generic_form.html',c)

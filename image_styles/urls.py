@@ -1,6 +1,8 @@
 from django.urls import include, re_path
 from . import views
 
+app_name = 'image_styles'
+
 urlpatterns = [
     re_path(r'^$',views.manage_image_styles,name="manage_image_styles"),
     re_path(r'^effect_form(?:/(?P<effect_id>\d+))?/$',views.effect_form,name='effect_form'),
