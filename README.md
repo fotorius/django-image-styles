@@ -23,9 +23,10 @@ If you haven't install libjpeg-dev:
 sudo apt-get install libjpeg-dev
 ```
 
-Apply to an existing django project:
+Install into the current evnironment:
 ```
-pip install django-image-styles
+pip install git+https://github.com/devalfrz/django-image-styles
+# pip install django-image-styles # PyPi implementation currently not working properly
 ```
 Add to installed apps in your project `settings.py` and the MEDIA settings:
 ```
