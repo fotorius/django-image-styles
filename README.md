@@ -42,7 +42,7 @@ Include the _image styles_ path in the ´my_project/urls.py´ file:
 
 ```
 ...
-    path('',include('image_styles.urls',namespace='image_styles')),
+    path('image_styles/',include('image_styles.urls',namespace='image_styles')),
 ...
 ```
 Run migrations and the initial data of the module.
