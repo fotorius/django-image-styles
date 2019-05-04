@@ -3,103 +3,59 @@ from django import forms
 from .models import *
 
 EFFECT_CHOICES = (
-  ('crop','Crop'),
-  ('enhance','Enhance'),
-  ('resize','Resize'),
-  ('rotate','Rotate'),
-  ('round-corners','Round Corners'),
-  ('scale','Scale'),
-  ('smart-scale','Smart Scale'),
+  ('Crop','Crop'),
+  ('Enhance','Enhance'),
+  ('Resize','Resize'),
+  ('Rotate','Rotate'),
+  ('RoundCorners','Round Corners'),
+  ('Scale','Scale'),
+  ('SmartScale','Smart Scale'),
 )
 
-class RoundCornersForm(forms.ModelForm):
-    effect = forms.CharField(
-      widget=forms.HiddenInput(),
-      initial='round-corners',
-    )
+class EffectMixin:
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.fields['style'].widget = forms.HiddenInput()
+        self.fields['weight'].widget = forms.HiddenInput()
+
+class RoundCornersForm(EffectMixin,forms.ModelForm):
     class Meta:
         model = RoundCorners
-        fields = ['style','radius','weight']
-        widgets = {
-            'style':forms.HiddenInput,
-            'weight':forms.HiddenInput,
-        }
-class CropForm(forms.ModelForm):
-    effect = forms.CharField(
-      widget=forms.HiddenInput(),
-      initial='crop',
-    )
+        fields = '__all__'
+
+class CropForm(EffectMixin,forms.ModelForm):
     class Meta:
         model = Crop
-        fields = ['style','height','width','anchor','weight']
-        widgets = {
-            'style':forms.HiddenInput,
-            'weight':forms.HiddenInput,
-        }
-class EnhanceForm(forms.ModelForm):
-    effect = forms.CharField(
-      widget=forms.HiddenInput(),
-      initial='enhance',
-    )
+        fields = '__all__'
+
+class EnhanceForm(EffectMixin,forms.ModelForm):
     class Meta:
         model = Enhance
-        fields = ['style','contrast','brightness','color','sharpness','weight']
-        widgets = {
-            'style':forms.HiddenInput,
-            'weight':forms.HiddenInput,
-        }
-class ResizeForm(forms.ModelForm):
-    effect = forms.CharField(
-      widget=forms.HiddenInput(),
-      initial='resize',
-    )
+        fields = '__all__'
+
+class ResizeForm(EffectMixin,forms.ModelForm):
     class Meta:
         model = Resize
-        fields = ['style','height','width','weight']
-        widgets = {
-            'style':forms.HiddenInput,
-            'weight':forms.HiddenInput,
-        }
-class RotateForm(forms.ModelForm):
-    effect = forms.CharField(
-      widget=forms.HiddenInput(),
-      initial='rotate',
-    )
+        fields = '__all__'
+
+class RotateForm(EffectMixin,forms.ModelForm):
     class Meta:
         model = Rotate
-        fields = ['style','angle','weight']
-        widgets = {
-            'style':forms.HiddenInput,
-            'weight':forms.HiddenInput,
-        }
-class ScaleForm(forms.ModelForm):
-    effect = forms.CharField(
-      widget=forms.HiddenInput(),
-      initial='scale',
-    )
+        fields = '__all__'
+
+class ScaleForm(EffectMixin,forms.ModelForm):
     class Meta:
         model = Scale
-        fields = ['style','height','width','allow_upscale','weight','mode']
-        widgets = {
-            'style':forms.HiddenInput,
-            'weight':forms.HiddenInput,
-        }
-class SmartScaleForm(forms.ModelForm):
-    effect = forms.CharField(
-      widget=forms.HiddenInput(),
-      initial='smart-scale',
-    )
+        fields = '__all__'
+
+class SmartScaleForm(EffectMixin,forms.ModelForm):
     class Meta:
         model = SmartScale
-        fields = ['style','height','width','allow_upscale','weight','mode']
-        widgets = {
-            'style':forms.HiddenInput,
-            'weight':forms.HiddenInput,
-        }
+        fields = '__all__'
 
 class EffectForm(forms.Form):
-   create_effect = forms.ChoiceField(choices=EFFECT_CHOICES)
-   style = forms.CharField(widget=forms.HiddenInput())
+   effect = forms.ChoiceField(choices=EFFECT_CHOICES)
+   style = forms.ModelChoiceField(queryset=Style.objects.all(),widget=forms.HiddenInput())
    
 class StyleForm(forms.ModelForm):
     class Meta:

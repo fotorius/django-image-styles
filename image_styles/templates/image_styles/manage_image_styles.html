@@ -83,7 +83,7 @@ ul.errorlist li{
     </div><!-- ./navbar-header -->
     <div class="collapse navbar-collapse">  
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="{% url 'image_styles:style' %}" class="add-style toggle-generic-modal"><span class="glyphicon glyphicon-plus" data-toggle="tooltip" data-placement="bottom" title="New Style"></span> New Style</a></li>
+        <li><a href="{% url 'image_styles:style_create' %}" class="add-style toggle-generic-modal"><span class="glyphicon glyphicon-plus" data-toggle="tooltip" data-placement="bottom" title="New Style"></span> New Style</a></li>
       </ul>
     </div>
   </div>
@@ -91,12 +91,12 @@ ul.errorlist li{
       <div class="container">
 {% for s in styles %}
     <div class="row"><div class="col-sm-6 col-sm-offset-3">
-      <h2><span class="style-name">{{s.style}}</span><a href="{% url 'image_styles:style' s.style.id %}" class="edit-style glyphicon glyphicon-pencil toggle-generic-modal" data-toggle="tooltip" data-placement="top" title="Edit Style"></a><a href="{% url 'image_styles:effect_form' s.style.id %}" class="glyphicon glyphicon-plus add-effect pull-right toggle-generic-modal" data-toggle="tooltip" data-placement="top" title="Add Effect"></a></h2>
+      <h2><span class="style-name">{{s.style}}</span><a href="{% url 'image_styles:style_update' s.style.id %}" class="edit-style glyphicon glyphicon-pencil toggle-generic-modal" data-toggle="tooltip" data-placement="top" title="Edit Style"></a><a href="{% url 'image_styles:effect_create_init' s.style.id %}" class="glyphicon glyphicon-plus add-effect pull-right toggle-generic-modal" data-toggle="tooltip" data-placement="top" title="Add Effect"></a></h2>
     </div></div><!-- /.col-md-6.col-md-offset-3 --><!-- /.row -->
     <div class="row effects"><div class="loading"></div><div class="col-sm-6 col-sm-offset-3 sortable">
   {% for effect in s.effects %}
     <div class="effect"> <span class="glyphicon glyphicon-move move-effect" aria-hidden="true"></span>&nbsp;{{effect.name}}<span class="glyphicon glyphicon-pencil edit-effect pull-right" aria-hidden="true"></span>
-    <form action="{% url 'image_styles:effect_form' effect.object.id %}" method="POST" class="hidden effect-form">
+    <form action="{% url 'image_styles:effect_update' effect.object.id effect.object.get_name %}" method="POST" class="hidden effect-form">
       {% csrf_token %}
       <table class="table">
       {{effect.form.as_table}}
@@ -201,18 +201,18 @@ $(".effect-form").submit(function( event ) {
   var effect = $(this).closest('.effect');
   var effects = effect.closest('.effects');
   var loading = $('.loading');
-  var del = submit_name == 'delete' ? '&delete=Delete' : '';
+  var method = submit_name == 'delete' ? 'DELETE' : 'POST';
+  var url = $(this).attr('action');
   submit_name = '';
   loading.addClass('active');
-  console.log($(this).serialize()+del);
   $.ajax({ 
-    data: $(this).serialize()+del,
-    type: $(this).attr('method'), 
-    url: $(this).attr('action'), 
+    data: $(this).serialize(),
+    method: method,
+    url: url, 
     success: function(response) {
       effect.removeClass('moved');
       if(!$('.effect.moved').length) loading.removeClass('active');
-      if(del != ''){
+      if(method == 'DELETE'){
         effect.remove();
       }else{
         $(this).html(response);
@@ -238,11 +238,11 @@ function format_modal_form(){
   $('#generic-modal').modal('show');
   $("#generic-modal form").submit(function(event) {
     event.preventDefault();
-    var del = submit_name == 'delete' ? '&delete=Delete' : '';
+    var method = submit_name == 'delete' ? 'DELETE' : 'POST';
     submit_name = '';
-    $.ajax({ 
-      data: $(this).serialize()+del,
-      type: $(this).attr('method'), 
+    $.ajax({
+      method: method,
+      data: $(this).serialize(),
       url: $(this).attr('action'), 
       success: function(response,status,xhr) {
         $('#generic-modal .modal-dialog').html(response);

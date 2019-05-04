@@ -10,9 +10,9 @@
           {{form}}
         </div>
         <div class="modal-footer">
-          {% if delete %}<input type="submit" class="btn btn-danger pull-left" name="delete" value="{{delete}}">{% endif %}
+          {% if delete_button %}<input type="submit" class="btn btn-danger pull-left" name="delete" value="{{delete_button}}">{% endif %}
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <input type="submit" class="btn btn-primary pull-right" value="{% if button_ok %}{{button_ok}}{% else %}Save{% endif %}">
+          {% if submit_button %}<input type="submit" class="btn btn-primary pull-right" value="{{submit_button}}">{% endif %}
         </div>
       </div>
       </form>

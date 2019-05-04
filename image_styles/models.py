@@ -8,6 +8,33 @@ def get_upload_file_name(instance,filename):
     return "image_styles/%s/%s" % (instance.style.name,filename)
 
 
+class StyleMixin:
+    def save(self,*args,**kwargs):
+        if not self.id and self.weight == 0:
+            es = self.style.get_effects()[::-1]
+            if len(es) is not 0:
+                self.weight = es[0]['weight']+1
+        sv = super().save(*args,**kwargs)
+        self.style.delete_images()
+        return sv
+    
+    def delete(self,*args,**kwargs):
+        self.style.delete_images()
+        super().delete(*args,**kwargs)
+
+    def __str__(self):
+        return self.style.name  
+
+    def get_name(self):
+        """
+        Get style name
+        """
+        name = ''
+        r = re.search(r'models\.(?P<name>\w+)',str(type(self)))
+        if r:
+            name = r.group('name')
+        return name
+
 class Style(models.Model):
     name = models.SlugField(max_length=127,unique=True)
     
@@ -155,16 +182,25 @@ class ImageStyle(models.Model):
                 else:
                     if w > width and h > height:
                         im = im.resize((width,height),effect['object'].mode)
+
             elif type(effect['object']) is SmartScale:
                 w, h = im.size
                 im_prop = float(h)/float(w)
 
-                if im_prop > 1.0:
-                    width = effect['object'].width
-                    height = int(float(h)/w*width)
+                if effect['object'].largest:
+                    if im_prop > 1.0:
+                        width = effect['object'].width
+                        height = int(float(h)/w*width)
+                    else:
+                        height = effect['object'].height
+                        width = int(float(w)/h*height)
                 else:
-                    height = effect['object'].height
-                    width = int(float(w)/h*height)
+                    if im_prop < 1.0:
+                        width = effect['object'].width
+                        height = int(float(h)/w*width)
+                    else:
+                        height = effect['object'].height
+                        width = int(float(w)/h*height)
 
                 if effect['object'].allow_upscale:
                     im = im.resize((width,height),effect['object'].mode)
@@ -200,9 +236,9 @@ class ImageStyle(models.Model):
                 os.makedirs(os.path.dirname(os.path.join(settings.MEDIA_ROOT,new_image)))
             self.image = new_image
         self.apply_effects(self.style.get_effects())
-        return super(ImageStyle,self).save(*args,**kwargs)
+        return super().save(*args,**kwargs)
 
-class Crop(models.Model):
+class Crop(StyleMixin,models.Model):
     ANCHORS = (
         (1,'top-left'),
         (2,'top-center'),
@@ -219,25 +255,8 @@ class Crop(models.Model):
     anchor = models.IntegerField(choices=ANCHORS,default=5)
     style = models.ForeignKey(Style,on_delete=models.CASCADE)
     weight = models.IntegerField(default=0)
-    
-    def save(self,*args,**kwargs):
-        if not self.id and self.weight == 0:
-            es = self.style.get_effects()[::-1] 
-            if len(es) is not 0:
-                self.weight = es[0]['weight']+1
-        sv = super(Crop,self).save(*args,**kwargs)
-        self.style.delete_images()
-        return sv
-    
-    def delete(self,*args,**kwargs):
-        self.style.delete_images()
-        super(Crop,self).delete(*args,**kwargs)
 
-    def __unicode__(self):
-        return self.style.name                
-
-
-class Enhance(models.Model):
+class Enhance(StyleMixin,models.Model):
     CONTRASTS = zip( range(-100,101), range(-100,101) )
     SHARPNESSES = zip( range(-100,101), range(-100,101) )
     BRIGHTNESSES = zip( range(-100,101), range(-100,101) )
@@ -249,91 +268,31 @@ class Enhance(models.Model):
 
     style = models.ForeignKey(Style,on_delete=models.CASCADE)
     weight = models.IntegerField(default=0)
-    
-    def save(self,*args,**kwargs):
-        if not self.id and self.weight == 0:
-            es = self.style.get_effects()[::-1]
-            if len(es) is not 0:
-                self.weight = es[0]['weight']+1
-        sv = super(Enhance,self).save(*args,**kwargs)
-        self.style.delete_images()
-        return sv
-    
-    def delete(self,*args,**kwargs):
-        self.style.delete_images()
-        super(Enhance,self).delete(*args,**kwargs)
 
-    def __unicode__(self):
-        return self.style.name  
 
-class Resize(models.Model):
+class Resize(StyleMixin,models.Model):
     width = models.IntegerField()
     height = models.IntegerField()
 
     style = models.ForeignKey(Style,on_delete=models.CASCADE)
     weight = models.IntegerField(default=0)
 
-    def save(self,*args,**kwargs):
-        if not self.id and self.weight == 0:
-            es = self.style.get_effects()[::-1]
-            if len(es) is not 0:
-                self.weight = es[0]['weight']+1
-        sv = super(Resize,self).save(*args,**kwargs)
-        self.style.delete_images()
-        return sv
-    
-    def delete(self,*args,**kwargs):
-        self.style.delete_images()
-        super(Resize,self).delete(*args,**kwargs)
 
-    def __unicode__(self):
-        return self.style.name  
-
-class RoundCorners(models.Model):
+class RoundCorners(StyleMixin,models.Model):
     radius = models.IntegerField()
     style = models.ForeignKey(Style,on_delete=models.CASCADE)
     weight = models.IntegerField(default=0)
 
-    def save(self,*args,**kwargs):
-        if not self.id and self.weight == 0:
-            es = self.style.get_effects()[::-1]
-            if len(es) is not 0:
-                self.weight = es[0]['weight']+1
-        sv = super(RoundCorners,self).save(*args,**kwargs)
-        self.style.delete_images()
-        return sv
-    
-    def delete(self,*args,**kwargs):
-        self.style.delete_images()
-        super(RoundCorners,self).delete(*args,**kwargs)
 
-    def __unicode__(self):
-        return self.style.name  
-
-class Rotate(models.Model):
+class Rotate(StyleMixin,models.Model):
     ANGLES = zip( range(90,360,90), range(90,360,90) )
     angle = models.IntegerField(choices=ANGLES,default=0)
 
     style = models.ForeignKey(Style,on_delete=models.CASCADE)
     weight = models.IntegerField(default=0)
 
-    def save(self,*args,**kwargs):
-        if not self.id and self.weight == 0:
-            es = self.style.get_effects()[::-1]
-            if len(es) is not 0:
-                self.weight = es[0]['weight']+1
-        sv = super(Rotate,self).save(*args,**kwargs)
-        self.style.delete_images()
-        return sv
 
-    def delete(self,*args,**kwargs):
-        self.style.delete_images()
-        super(Rotate,self).delete(*args,**kwargs)
-
-    def __unicode__(self):
-        return self.style.name  
-
-class Scale(models.Model):
+class Scale(StyleMixin,models.Model):
     MODES = (
         (Image.NEAREST,'Nearest'),
         (Image.ANTIALIAS,'Antialias'),
@@ -348,25 +307,9 @@ class Scale(models.Model):
     style = models.ForeignKey(Style,on_delete=models.CASCADE)
     weight = models.IntegerField(default=0)
 
-    def save(self,*args,**kwargs):
-        if not self.id and self.weight == 0:
-            es = self.style.get_effects()[::-1]
-            if len(es) is not 0:
-                self.weight = es[0]['weight']+1
-        sv = super(Scale,self).save(*args,**kwargs)
-        self.style.delete_images()
-        return sv
-
-    def delete(self,*args,**kwargs):
-        self.style.delete_images()
-        super(Scale,self).delete(*args,**kwargs)
-
-    def __unicode__(self):
-        return self.style.name  
 
 
-
-class SmartScale(models.Model):
+class SmartScale(StyleMixin,models.Model):
     MODES = (
         (Image.NEAREST,'Nearest'),
         (Image.ANTIALIAS,'Antialias'),
@@ -377,23 +320,8 @@ class SmartScale(models.Model):
     width = models.IntegerField()
     height = models.IntegerField()
     allow_upscale = models.BooleanField(default=True)
+    largest = models.BooleanField(help_text=('Constraint by largest dimension.'),default=True)
 
     style = models.ForeignKey(Style,on_delete=models.CASCADE)
     weight = models.IntegerField(default=0)
-
-    def save(self,*args,**kwargs):
-        if not self.id and self.weight == 0:
-            es = self.style.get_effects()[::-1]
-            if len(es) is not 0:
-                self.weight = es[0]['weight']+1
-        sv = super(SmartScale,self).save(*args,**kwargs)
-        self.style.delete_images()
-        return sv
-
-    def delete(self,*args,**kwargs):
-        self.style.delete_images()
-        super(SmartScale,self).delete(*args,**kwargs)
-
-    def __unicode__(self):
-        return self.style.name  
 
