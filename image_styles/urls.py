@@ -12,5 +12,5 @@ urlpatterns = [
     path('effect/<int:effect_id>/<slug:effect_name>/update/',EffectUpdateView.as_view(),name='effect_update'),
     path('style/',StyleView.as_view(),name='style_create'),
     path('style/<int:style_id>/',StyleView.as_view(),name='style_update'),
-    re_path(r'^(?P<style_name>[\w_-]+)/(?P<path>[^\s/$.?#].*)',RenderImageView.as_view(),name='render_image'),
+    #re_path(r'^(?P<style_name>[\w_-]+)/(?P<path>[^\s/$.?#].*)',RenderImageView.as_view(),name='render_image'),
 ]

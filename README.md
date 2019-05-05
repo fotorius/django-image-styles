@@ -13,7 +13,7 @@ Simple, fast and easy-to-use tool for pre-rendering images on Django.
   - Scale Proportionally
   - Scale by width or height (Smart Scale)
   - Round Corners
-- Render in **Templates** or via **URL**
+- Render in **Templates**
 - Effect Management Utility
 
 ## Installation
@@ -71,68 +71,17 @@ At the top of your template:
 ```
 ...
 {% load image_styles %}
+
 ...
 
-```
-### Method 1
-```
-...
 <img src="{{MEDIA_URL}}{{image|style:'small_thumbnail'}}" alt="Image Description">
 ...
 ```
-### Method 2
-```
-...
-{% render_image image 'small_thumbnail' 'Optional Image Description' %}
-...
-```
-Or you can simply add the ID of the format:
-```
-...
-{% render_image image 1 %}
-...
-```
-## Rendering images via URL
-
-You can use `http://localhost:8000/image_styles/<style id>/<path to your image>` to load images with a URL. This feature is VERY useful when dealing with APIs and trying to retreive the correct styled and sized image to a mobile app.
-This can also be used in a template like this:
-```
-...
-<img src="{% url 'image_styles:render_image' 1 image.name %}">
-...
-```
-Where `1` is the style id and `image` is a `django.models.ImageField` object.
-
-## Rendering images via Views
-
-This is useful when outputting images for API resources.
-
-Import the *reverse* function at the top of the `views.py` file.
-```
-...
-from django.urls import reverse
-from image_styles.utils import render_image
-from django.conf import settings
-...
-```
-Finally you can get the image like so:
-```
-rendered_image = render_image(1,image.name)
-image_url = settings.MEDIA_URL[:-1]+reverse(
-    'image_styles:render_image',
-    kwargs={
-        'style_name':'thumbnail',
-        'path':image.name
-    }
-)
-```
-Where `1` is the style id and `image` is a `django.models.ImageField` object.
 
 ## Manage your styles
 
 To crate a style you need to follow the next steps:
-* As shown in the **Rendering images via URL** section, you need to add the `path('image_styles/', include('image_styles.urls',namespace='image_styles')),` path to your root `urls.py` file.
-* To access the image styles admin interface simply go to `http://localhost:8000/image_styles/`.
+* To access the image styles admin interface you need to add the `path('image_styles/', include('image_styles.urls',namespace='image_styles')),` path to your root `urls.py` file, then simply go to `http://localhost:8000/image_styles/`.
 
 If a style is modified in any way, it will be resetted and the new images will be re-rendered when needed. The admin site is **only available for staff users**.
 
