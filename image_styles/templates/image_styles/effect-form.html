@@ -1,0 +1,11 @@
+<form action="{{action}}" method="POST" class="effect-form" hidden>
+  {% csrf_token %}
+  <table class="table">
+  {{form.as_table}}
+  <tr>
+      <td><input type="submit" class="btn btn-danger effect-delete" name="delete" value="Delete"></td>
+      <td class="text-right"><input type="submit" class="btn btn-primary pull-right effect-save" value="Save"></td>
+  </tr>
+  </table>
+</form>
+

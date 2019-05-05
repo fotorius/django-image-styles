@@ -5,28 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Manage Image Styles</title>
     <link rel="stylesheet" href="{% static 'image_styles/node_modules/bootstrap/dist/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'image_styles/node_modules/font-awesome/css/font-awesome.min.css' %}">
   <style>
-h2 > a.edit-style, h2 > a.add-effect{
-  font-size: 15px!important;
-  margin-top: 13px;    
-  cursor: pointer;
+h2{
+  display: flex;
+  align-items: end;
 }
 h2 a{
-  color: transparent;
   padding: 5px;
-}
-h2 > a.add-effect{
-  color: rgb(51, 122, 183)!important;   
-}
-h2 > span.style-name{
-  color: #333!important;
-}
-h2:hover{
-  background-color: #f8f8f8;
-}
-h2:hover a{
   color: #333;
   text-decoration: none;
+  font-size: 1rem;
 }
 div.effect{
   background-color: #f8f8f8;
@@ -34,17 +23,18 @@ div.effect{
   padding: 2px 8px;
   margin: 5px 0;
 }
-div.effect .edit-effect{
+.effect-move{
+  cursor:move;
+}
+.effect-header{
+  display: flex;
+}
+.effect-edit{
+  cursor:pointer;
   color: transparent;
 }
-div.effect:hover .edit-effect{
+.effect-edit:hover{
   color: #333;
-}
-.move-effect{
-  cursor:move;    
-}
-.edit-effect{
-  cursor:pointer;
 }
 .effects{
   position: relative;
@@ -75,18 +65,24 @@ ul.errorlist li{
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-main">
     <span class="navbar-toggler-icon"></span>
   </button>
-   <a href="{% url 'image_styles:style_create' %}" class="nav-link ml-auto" data-toggle="modal" data-target="#generic-modal">New Style</a>
+   <a href="{% url 'image_styles:style_create' %}" class="nav-link ml-auto" data-toggle="modal" data-target="#generic-modal"><i class="fa fa-plus"></i> New Style</a>
 </nav>
 
       <div class="container">
 {% for s in styles %}
     <div class="row"><div class="col-sm-6 offset-sm-3">
-      <h2><span class="style-name">{{s.style}}</span><a href="{% url 'image_styles:style_update' s.style.id %}" data-toggle="modal" data-target="#generic-modal">Edit</a><a href="{% url 'image_styles:effect_create_init' s.style.id %}" data-toggle="modal" data-target="#generic-modal">New</a></h2>
+      <h2 class="style-title"><span class="style-name">{{s.style}}</span><a href="{% url 'image_styles:style_update' s.style.id %}" data-toggle="modal" data-target="#generic-modal"><i class="fa fa-pencil"></i></a><a class="ml-auto" href="{% url 'image_styles:effect_create_init' s.style.id %}" data-toggle="modal" data-target="#generic-modal"><i class="fa fa-plus"></i></a></h2>
     </div></div>
     <div class="row effects"><div class="loading"></div><div class="col-sm-6 offset-sm-3 sortable">
   {% for effect in s.effects %}
-    <div class="effect"><span class="move-effect">move</span> {{effect.name}} <span class="edit-effect">edit</span>
-    {% include 'image_styles/form.html' with action=effect.action form=effect.form %}
+    <div class="effect">
+      <div class="effect-move">
+        <div class="effect-header">
+          <div class="effect-title"><i class="fa fa-bars"></i></span> {{effect.name}}</div>
+          <div class="effect-edit ml-auto"><i class="fa fa-pencil"></i></div>
+        </div>
+      </div>
+      {% include 'image_styles/effect-form.html' with action=effect.action form=effect.form %}
     </div>
   {% endfor %}
     </div></div>
@@ -152,24 +148,25 @@ var csrftoken = getCookie('csrftoken');
 
 
 $('.sortable').sortable({
-  handle: '.move-effect',
+  handle: '.effect-move',
   stop: function( event, ui ) {
     var weight=0;
     $(this).parent().find('form #id_weight').each(function(){
       $(this).val(weight);
       weight++;
     });
-    $(this).parent().find('form .save-effect').trigger( "click" );
+    $(this).parent().find('form .effect-save').trigger( "click" );
     $(this).find('.effect').addClass('moved');
   }
 });
 
-$('.edit-effect').on('click',function(){
-  let attr = $(this).attr('hidden');
+$('.effect-edit').on('click',function(){
+  let form = $(this).closest('.effect').find('form');
+  let attr = form.attr('hidden');
   if(typeof attr !== typeof undefined && attr !== false){
-    $(this).parent().find('form').attr('hidden',true);
+    form.removeAttr('hidden');
   }else{
-    $(this).parent().find('form').removeAttr('hidden');
+    form.attr('hidden',true);
   }
 });
 
