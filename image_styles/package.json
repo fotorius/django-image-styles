@@ -1,0 +1,23 @@
+{
+  "name": "django-image-styles",
+  "version": "1.0.0",
+  "description": "Simple, fast and easy-to-use tool for pre-rendering images on Django.",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devalfrz/django-image-styles.git"
+  },
+  "author": "Alfredo Rius <alfredo.rius@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/devalfrz/django-image-styles/issues"
+  },
+  "homepage": "https://github.com/devalfrz/django-image-styles#readme",
+  "dependencies": {
+    "bootstrap": "^4.3.1",
+    "jquery": "^3.4.1",
+    "jqueryui": "^1.11.1"
+  }
+}

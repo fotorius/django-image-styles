@@ -25,7 +25,7 @@ class RenderImageView(View):
 
 
 class ModalForm(FormView):
-    template_name = 'image_styles/bootstrap_form_modal.html'
+    template_name = 'image_styles/modal_form.html'
     submit_button = 'Save'
     delete_button = ''
     title = 'Create'
@@ -137,7 +137,7 @@ class StyleFormMixin:
 
 @method_decorator(staff_member_required(),name='dispatch')
 class ManageImageStylesView(TemplateView):
-    template_name = 'image_styles/manage_image_styles.html'
+    template_name = 'image_styles/home.html'
 
     def get_image_styles(self):
         ims = []
@@ -147,6 +147,13 @@ class ManageImageStylesView(TemplateView):
                 form = get_effect_form_class(effect_model=effects[i]['object']) 
                 if form:
                     effects[i]['form'] = form(instance=effects[i]['object'])
+                    effects[i]['action'] = reverse(
+                        'image_styles:effect_update',
+                        kwargs = {
+                            'effect_id':effects[i]['object'].id,
+                            'effect_name':effects[i]['object'].get_name()
+                        }
+                    )
             ims.append({
                 'style':s,
                 'effects':effects,

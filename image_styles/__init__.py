@@ -3,7 +3,7 @@ Django Image Styles
 """
 
 __title__ = 'Django Image Styles'
-__version__ = '1.4.3'
+__version__ = '1.4.4'
 __author__ = 'Alfredo Rius'
 __license__ = 'BSD 2-Clause'
 __copyright__ = 'Copyright 2015-2019 Alfredo Rius'

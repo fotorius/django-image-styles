@@ -55,3 +55,8 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# npm
+#/image_styles/node_modules
+/image_styles/package-lock.json
+!/image_styles/package.json
