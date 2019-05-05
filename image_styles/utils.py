@@ -1,9 +1,11 @@
 from django.conf import settings
 from django.http import Http404
-import shutil,os
+import shutil,os,re
 from django.urls import reverse
 from django.core.exceptions import MultipleObjectsReturned
 from .models import *
+from .forms import CropForm,EnhanceForm,ResizeForm,SmartScaleForm
+from .forms import RotateForm,ScaleForm,RoundCornersForm
 
 def style(orig_image,style_name):
     try:
@@ -66,4 +68,23 @@ def get_image(image_name,style_name):
         }
     )
     return image_url
+
+def get_effect_form_class(effect_name):
+    if effect_name == 'Crop':
+        return CropForm 
+    elif effect_name == 'Enhance':
+        return EnhanceForm 
+    elif effect_name == 'Resize':
+        return ResizeForm 
+    elif effect_name == 'Rotate':
+        return RotateForm 
+    elif effect_name == 'Scale':
+        return ScaleForm 
+    elif effect_name == 'RoundCorners':
+        return RoundCornersForm 
+    elif effect_name == 'SmartScale':
+        return SmartScaleForm 
+    return None
+
+
 
