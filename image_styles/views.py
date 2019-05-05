@@ -78,21 +78,21 @@ def style(request,style_id=None):
 
     if style_id is not None:
         style = get_object_or_404(Style,pk=style_id)
-        action = reverse('image_styles:style',kwargs={'style_id':style_id})
-        button_ok = 'Save'
+        action = reverse('image_styles:style_update',kwargs={'style_id':style_id})
+        submit_button = 'Save'
         title = 'Edit Style: %s' % (style.name)
         delete = 'Delete'
     else:
-        action = reverse('image_styles:style')
-        button_ok = 'Create'
+        action = reverse('image_styles:style_create')
+        submit_button = 'Create'
         title = 'Create Style'
         delete = None
     c = {
         'form':form,
         'action':action,
-        'button_ok': button_ok,
+        'submit_button': submit_button,
         'title':title,
-        'delete':delete
+        'delete_button':delete
      }
     return render(request,'image_styles/bootstrap_form_modal.html',c)
 

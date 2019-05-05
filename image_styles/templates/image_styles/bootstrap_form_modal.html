@@ -7,7 +7,7 @@
         </div>
         <div class="modal-body">
           {% csrf_token %}
-          {{form}}
+          {{form.as_p}}
         </div>
         <div class="modal-footer">
           {% if delete_button %}<input type="submit" class="btn btn-danger pull-left" name="delete" value="{{delete_button}}">{% endif %}
