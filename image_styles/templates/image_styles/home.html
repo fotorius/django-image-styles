@@ -6,58 +6,7 @@
     <title>Manage Image Styles</title>
     <link rel="stylesheet" href="{% static 'image_styles/node_modules/bootstrap/dist/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'image_styles/node_modules/font-awesome/css/font-awesome.min.css' %}">
-  <style>
-h2{
-  display: flex;
-  align-items: end;
-}
-h2 a{
-  padding: 5px;
-  color: #333;
-  text-decoration: none;
-  font-size: 1rem;
-}
-div.effect{
-  background-color: #f8f8f8;
-  border: #e7e7e7 solid 1px;
-  padding: 2px 8px;
-  margin: 5px 0;
-}
-.effect-move{
-  cursor:move;
-}
-.effect-header{
-  display: flex;
-}
-.effect-edit{
-  cursor:pointer;
-  color: transparent;
-}
-.effect-edit:hover{
-  color: #333;
-}
-.effects{
-  position: relative;
-  z-index:1;
-}
-.loading{
-  display: none;
-  background-color: rgba(255,255,255,0.7); 
-  position: absolute;
-  top:0;
-  bottom:0;
-  left:0;
-  right:0;
-  z-index:2;
-}
-.loading.active{
-  display: inherit;
-}
-ul.errorlist li{
-  list-style-type:none;
-  color: #d43f3a;
-}
-  </style>
+    <link rel="stylesheet" href="{% static 'image_styles/css/styles.css' %}">
   </head>
   <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -82,7 +31,7 @@ ul.errorlist li{
           <div class="effect-edit ml-auto"><i class="fa fa-pencil"></i></div>
         </div>
       </div>
-      {% include 'image_styles/effect-form.html' with action=effect.action form=effect.form %}
+      {% include 'image_styles/effect_form.html' with action=effect.action form=effect.form %}
     </div>
   {% endfor %}
     </div></div>
@@ -110,143 +59,6 @@ ul.errorlist li{
     <script src="{% static 'image_styles/node_modules/jquery/dist/jquery.min.js' %}"></script>
     <script src="{% static 'image_styles/node_modules/jqueryui/jquery-ui.min.js' %}"></script>
     <script src="{% static 'image_styles/node_modules/bootstrap/dist/js/bootstrap.min.js' %}"></script>
-    <script>
-/* AJAX CSRF Support */
-// https://docs.djangoproject.com/en/1.8/ref/csrf/
-function csrfSafeMethod(method) {
-    // these HTTP methods do not require CSRF protection
-    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-}
-$.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-        }
-    }
-});
-
-
-// https://docs.djangoproject.com/en/1.7/ref/contrib/csrf/
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie != '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-var csrftoken = getCookie('csrftoken');
-
-
-
-$('.sortable').sortable({
-  handle: '.effect-move',
-  stop: function( event, ui ) {
-    var weight=0;
-    $(this).parent().find('form #id_weight').each(function(){
-      $(this).val(weight);
-      weight++;
-    });
-    $(this).parent().find('form .effect-save').trigger( "click" );
-    $(this).find('.effect').addClass('moved');
-  }
-});
-
-$('.effect-edit').on('click',function(){
-  let form = $(this).closest('.effect').find('form');
-  let attr = form.attr('hidden');
-  if(typeof attr !== typeof undefined && attr !== false){
-    form.removeAttr('hidden');
-  }else{
-    form.attr('hidden',true);
-  }
-});
-
-var submit_name = '';
-$('input[type="submit"]').click(function(e){
-  e.preventDefault();
-  submit_name = ($(this).attr('name')) ? $(this).attr('name') : '';
-  $(this).closest('form').submit();
-});
-
-$(".effect-form").submit(function( event ) {
-  event.preventDefault();
-  var effect = $(this).closest('.effect');
-  var effects = effect.closest('.effects');
-  var loading = $('.loading');
-  var method = submit_name == 'delete' ? 'DELETE' : 'POST';
-  var url = $(this).attr('action');
-  submit_name = '';
-  loading.addClass('active');
-  $.ajax({ 
-    data: $(this).serialize(),
-    method: method,
-    url: url, 
-    success: function(response) {
-      effect.removeClass('moved');
-      if(!$('.effect.moved').length) loading.removeClass('active');
-      if(method == 'DELETE'){
-        effect.remove();
-      }else{
-        $(this).html(response);
-        $(this).find('input[type=submit]').click(function(e){
-          e.preventDefault();
-          submit_name = ($(this).attr('name')) ? $(this).attr('name') : '';
-          $(this).closest('form').submit();
-        });
-      }
-    }
-  });
-});
-
-function format_modal_form(){
-  $('#generic-modal form input[type=text]').addClass("form-control");
-  $('#generic-modal form input[type=number]').addClass("form-control");
-  $('#generic-modal form select').addClass("form-control");
-  $('#generic-modal form input[type=submit]').click(function(e){
-    e.preventDefault();
-    submit_name = ($(this).attr('name')) ? $(this).attr('name') : '';
-    $(this).closest('form').submit();
-  });
-  $('#generic-modal').modal('show');
-  $("#generic-modal form").submit(function(event) {
-    event.preventDefault();
-    var method = submit_name == 'delete' ? 'DELETE' : 'POST';
-    submit_name = '';
-    $.ajax({
-      method: method,
-      data: $(this).serialize(),
-      url: $(this).attr('action'), 
-      success: function(response,status,xhr) {
-        $('#generic-modal .modal-dialog').html(response);
-        $('#generic-modal form input[type=text]').addClass("form-control");
-        $('#generic-modal form input[type=number]').addClass("form-control");
-        $('#generic-modal form select').addClass("form-control");
-        if(!$('#generic-modal .modal-dialog form').length){
-          location.reload();
-        }else{
-          format_modal_form(); 
-        }
-      }
-    });
-  });
-}
-$('[data-toggle="modal"]').on('click', function(e){
-  e.preventDefault();
-  let target = $($(this).data('target'));
-  target.removeData('bs.modal');
-  target.find('.modal-dialog').load($(this).attr('href'),function(response, status, xhr){
-    format_modal_form(); 
-  });
-});
-    </script>
+    <script src="{% static 'image_styles/js/scripts.js' %}"></script>
   </body>
 </html>
