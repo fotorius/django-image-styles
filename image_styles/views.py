@@ -18,7 +18,10 @@ class RenderImageView(View):
     def get(self,request,style_name,path):
         image = render_image(style_name,path)
         content_type = mimetypes.guess_type(image.image.path)
-        return HttpResponse(image.image.name,content_type=content_type[0])
+        f = open(image.image.path,"rb")
+        r = HttpResponse(f,content_type=content_type[0])
+        f.close()
+        return r
 
 
 class ModalForm(FormView):
