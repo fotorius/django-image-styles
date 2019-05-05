@@ -69,7 +69,11 @@ def get_image(image_name,style_name):
     )
     return image_url
 
-def get_effect_form_class(effect_name):
+def get_effect_form_class(effect_name=None,effect_model=None):
+    if effect_model:
+        r = re.search(r'models\.(?P<name>\w+)',str(type(effect_model)))
+        if r:
+            effect_name = r.group('name')
     if effect_name == 'Crop':
         return CropForm 
     elif effect_name == 'Enhance':
