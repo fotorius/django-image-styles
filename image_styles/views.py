@@ -54,6 +54,8 @@ class ModalForm(FormView):
 class EffectFormMixin:
     effect = None
     style = None
+    title = 'Create Effect'
+    submit_button = 'Create'
 
     def dispatch(self,request,*args,**kwargs):
         self.effect_name = self.kwargs.get('effect_name')
@@ -77,6 +79,16 @@ class EffectFormMixin:
         if self.effect:
             data['instance'] = self.effect
         return data
+
+    def get_submit_button(self):
+        if self.effect:
+            return 'Update'
+        return super().get_submit_button()
+
+    def get_title(self):
+        if self.effect:
+            return 'Update Effect'
+        return super().get_title()
 
     def get_action(self):
         if self.style:
@@ -124,6 +136,16 @@ class StyleFormMixin:
             )
         return reverse('image_styles:style_create')
 
+    def get_submit_button(self):
+        if self.style:
+            return 'Update'
+        return super().get_submit_button()
+
+    def get_title(self):
+        if self.style:
+            return 'Update Style'
+        return super().get_title()
+
     def form_valid(self,form):
         form.save()
         return HttpResponse("Style Created!")
@@ -169,7 +191,8 @@ class ManageImageStylesView(TemplateView):
 @method_decorator(staff_member_required(),name='dispatch')
 class EffectCreateInitView(ModalForm):
     form_class = EffectForm
-    submit_button = 'Create'
+    submit_button = 'Next'
+    title = 'Select Effect'
 
     def dispatch(self,request,*args,**kwargs):
         self.style = get_object_or_404(Style,id=self.kwargs.get('style_id'))
@@ -179,6 +202,16 @@ class EffectCreateInitView(ModalForm):
         form = super().get_form(**kwargs)
         form.initial['style'] = self.style
         return form
+
+    def get_submit_button(self):
+        if self.form_class != EffectForm:
+            return 'Create'
+        return super().get_submit_button()
+
+    def get_title(self):
+        if self.form_class != EffectForm:
+            return 'Create Effect'
+        return super().get_title()
 
     def get_action(self):
         if self.action == '.':
@@ -197,6 +230,9 @@ class EffectCreateInitView(ModalForm):
 
 @method_decorator(staff_member_required(),name='dispatch')
 class EffectCreateView(EffectFormMixin,ModalForm):
+    title = 'Create Effect'
+    submit_button = 'Create'
+
     def get_form(self,**kwargs):
         form = super().get_form(**kwargs)
         form.initial['style'] = self.style
