@@ -4,6 +4,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.urls import reverse,reverse_lazy
+from django.utils.translation import ugettext_lazy as _
 from django.views import View
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
@@ -18,7 +19,7 @@ class RenderImageView(View):
     def get(self,request,style_name,path):
         image = render_image(style_name,path)
         content_type = mimetypes.guess_type(image.image.path)
-        f = open(image.image.path,"rb")
+        f = open(image.image.path,'rb')
         r = HttpResponse(f,content_type=content_type[0])
         f.close()
         return r
@@ -26,9 +27,9 @@ class RenderImageView(View):
 
 class ModalForm(FormView):
     template_name = 'image_styles/modal_form.html'
-    submit_button = 'Save'
+    submit_button = _('Save')
     delete_button = ''
-    title = 'Create'
+    title = _('Create')
     action = '.'
 
     def get_action(self):
@@ -54,8 +55,8 @@ class ModalForm(FormView):
 class EffectFormMixin:
     effect = None
     style = None
-    title = 'Create Effect'
-    submit_button = 'Create'
+    title = _('Create Effect')
+    submit_button = _('Create')
 
     def dispatch(self,request,*args,**kwargs):
         self.effect_name = self.kwargs.get('effect_name')
@@ -82,12 +83,12 @@ class EffectFormMixin:
 
     def get_submit_button(self):
         if self.effect:
-            return 'Update'
+            return _('Update')
         return super().get_submit_button()
 
     def get_title(self):
         if self.effect:
-            return 'Update Effect'
+            return _('Update Effect')
         return super().get_title()
 
     def get_action(self):
@@ -103,13 +104,13 @@ class EffectFormMixin:
 
     def form_valid(self,form):
         form.save()
-        return HttpResponse("Effect Created!")
+        return HttpResponse(_('Effect Created!'))
         
     def delete(self,*args,**kwargs):
         if self.effect:
             self.effect.delete()
-            return HttpResponse("Effect Removed!")
-        return HttpResponse("Delete failed!")
+            return HttpResponse(_('Effect Removed!'))
+        return HttpResponse(_('Delete failed!'))
 
 class StyleFormMixin:
     style = None
@@ -119,7 +120,7 @@ class StyleFormMixin:
         style_id = self.kwargs.get('style_id')
         if style_id:
             self.style = get_object_or_404(Style,id=style_id)
-            self.delete_button = 'Delete'
+            self.delete_button = _('Delete')
         return super().dispatch(request,*args,**kwargs)
 
     def get_form_kwargs(self,*args,**kwargs):
@@ -138,23 +139,23 @@ class StyleFormMixin:
 
     def get_submit_button(self):
         if self.style:
-            return 'Update'
+            return _('Update')
         return super().get_submit_button()
 
     def get_title(self):
         if self.style:
-            return 'Update Style'
+            return _('Update Style')
         return super().get_title()
 
     def form_valid(self,form):
         form.save()
-        return HttpResponse("Style Created!")
+        return HttpResponse(_('Style Created!'))
         
     def delete(self,*args,**kwargs):
         if self.style:
             self.style.delete()
-            return HttpResponse("Style Removed!")
-        return HttpResponse("Delete failed!")
+            return HttpResponse(_('Style Removed!'))
+        return HttpResponse(_('Delete failed!'))
 
 
 @method_decorator(staff_member_required(),name='dispatch')
@@ -191,8 +192,8 @@ class ManageImageStylesView(TemplateView):
 @method_decorator(staff_member_required(),name='dispatch')
 class EffectCreateInitView(ModalForm):
     form_class = EffectForm
-    submit_button = 'Next'
-    title = 'Select Effect'
+    submit_button = _('Next')
+    title = _('Select Effect')
 
     def dispatch(self,request,*args,**kwargs):
         self.style = get_object_or_404(Style,id=self.kwargs.get('style_id'))
@@ -205,12 +206,12 @@ class EffectCreateInitView(ModalForm):
 
     def get_submit_button(self):
         if self.form_class != EffectForm:
-            return 'Create'
+            return _('Create')
         return super().get_submit_button()
 
     def get_title(self):
         if self.form_class != EffectForm:
-            return 'Create Effect'
+            return _('Create Effect')
         return super().get_title()
 
     def get_action(self):
@@ -230,8 +231,8 @@ class EffectCreateInitView(ModalForm):
 
 @method_decorator(staff_member_required(),name='dispatch')
 class EffectCreateView(EffectFormMixin,ModalForm):
-    title = 'Create Effect'
-    submit_button = 'Create'
+    title = _('Create Effect')
+    submit_button = _('Create')
 
     def get_form(self,**kwargs):
         form = super().get_form(**kwargs)

@@ -1,20 +1,20 @@
-{% load staticfiles %}<!DOCTYPE HTML>
-<html lang="en">
+{% load staticfiles %}{% load i18n %}<!DOCTYPE HTML>
+<html lang="{{LANGUAGE_CODE|default_if_none:'en-us'}}">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Manage Image Styles</title>
+    <title>{% trans "Manage Image Styles" %}</title>
     <link rel="stylesheet" href="{% static 'image_styles/node_modules/bootstrap/dist/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'image_styles/node_modules/font-awesome/css/font-awesome.min.css' %}">
     <link rel="stylesheet" href="{% static 'image_styles/css/styles.css' %}">
   </head>
   <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="{% url 'image_styles:manage_image_styles' %}">Image Styles</a>
+  <a class="navbar-brand" href="{% url 'image_styles:manage_image_styles' %}">{% trans "Image Styles" %}</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-main">
     <span class="navbar-toggler-icon"></span>
   </button>
-   <a href="{% url 'image_styles:style_create' %}" class="nav-link ml-auto" data-toggle="modal" data-target="#generic-modal"><i class="fa fa-plus"></i> New Style</a>
+   <a href="{% url 'image_styles:style_create' %}" class="nav-link ml-auto" data-toggle="modal" data-target="#generic-modal"><i class="fa fa-plus"></i> {% trans "New Style" %}</a>
 </nav>
 
       <div class="container">
@@ -42,13 +42,12 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Loading...</h5>
+        <h5 class="modal-title">{% trans "Loading..." %}</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <p>...</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

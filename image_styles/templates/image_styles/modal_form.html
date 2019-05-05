@@ -1,4 +1,4 @@
-<form action="{{action}}" method="POST">
+{% load i18n %}<form action="{{action}}" method="POST">
 <div class="modal-content">
   <div class="modal-header">
     <h5 class="modal-title">{{title}}</h5>
@@ -12,7 +12,7 @@
   </div>
   <div class="modal-footer">
     {% if delete_button %}<input type="submit" class="btn btn-danger mr-auto" name="delete" value="{{delete_button}}">{% endif %}
-    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Close" %}</button>
     {% if submit_button %}<input type="submit" class="btn btn-primary" value="{{submit_button}}">{% endif %}
   </div>
 </div>
