@@ -1,10 +1,10 @@
-<!DOCTYPE HTML>
+{% load staticfiles %}<!DOCTYPE HTML>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Manage Image Styles</title>
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'image_styles/node_modules/bootstrap/dist/css/bootstrap.min.css' %}">
   <style>
 h2 > a.edit-style, h2 > a.add-effect{
   font-size: 15px!important;
@@ -70,32 +70,22 @@ ul.errorlist li{
   </style>
   </head>
   <body>
-<nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="{% url 'image_styles:manage_image_styles' %}">Image Styles</a>
-    </div><!-- ./navbar-header -->
-    <div class="collapse navbar-collapse">  
-      <ul class="nav navbar-nav navbar-right">
-        <li><a href="{% url 'image_styles:style_create' %}" class="add-style toggle-generic-modal"><span class="glyphicon glyphicon-plus" data-toggle="tooltip" data-placement="bottom" title="New Style"></span> New Style</a></li>
-      </ul>
-    </div>
-  </div>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="{% url 'image_styles:manage_image_styles' %}">Image Styles</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-main">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+   <a href="{% url 'image_styles:style_create' %}" class="nav-link ml-auto" data-toggle="modal" data-target="#generic-modal">New Style</a>
 </nav>
+
       <div class="container">
 {% for s in styles %}
-    <div class="row"><div class="col-sm-6 col-sm-offset-3">
-      <h2><span class="style-name">{{s.style}}</span><a href="{% url 'image_styles:style_update' s.style.id %}" class="edit-style glyphicon glyphicon-pencil toggle-generic-modal" data-toggle="tooltip" data-placement="top" title="Edit Style"></a><a href="{% url 'image_styles:effect_create_init' s.style.id %}" class="glyphicon glyphicon-plus add-effect pull-right toggle-generic-modal" data-toggle="tooltip" data-placement="top" title="Add Effect"></a></h2>
+    <div class="row"><div class="col-sm-6 offset-sm-3">
+      <h2><span class="style-name">{{s.style}}</span><a href="{% url 'image_styles:style_update' s.style.id %}" data-toggle="modal" data-target="#generic-modal">Edit</a><a href="{% url 'image_styles:effect_create_init' s.style.id %}" data-toggle="modal" data-target="#generic-modal">New</a></h2>
     </div></div>
-    <div class="row effects"><div class="loading"></div><div class="col-sm-6 col-sm-offset-3 sortable">
+    <div class="row effects"><div class="loading"></div><div class="col-sm-6 offset-sm-3 sortable">
   {% for effect in s.effects %}
-    <div class="effect"> <span class="glyphicon glyphicon-move move-effect" aria-hidden="true"></span>&nbsp;{{effect.name}}<span class="glyphicon glyphicon-pencil edit-effect pull-right" aria-hidden="true"></span>
+    <div class="effect"><span class="move-effect">move</span> {{effect.name}} <span class="edit-effect">edit</span>
     {% include 'image_styles/form.html' with action=effect.action form=effect.form %}
     </div>
   {% endfor %}
@@ -103,29 +93,27 @@ ul.errorlist li{
 {% endfor %}
     </div>
 
-  <!-- Modal -->
-  <div class="modal fade" id="generic-modal" role="dialog">
-    <div class="modal-dialog">
-    
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Loading...</h4>
-        </div>
-        <div class="modal-body">
-          <p>...</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        </div>
+<div class="modal" id="generic-modal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Loading...</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
-      
+      <div class="modal-body">
+        <p>...</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
     </div>
-  </div><!-- /.modal -->
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  </div>
+</div>
+    <script src="{% static 'image_styles/node_modules/jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static 'image_styles/node_modules/jqueryui/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'image_styles/node_modules/bootstrap/dist/js/bootstrap.min.js' %}"></script>
     <script>
 /* AJAX CSRF Support */
 // https://docs.djangoproject.com/en/1.8/ref/csrf/
@@ -177,7 +165,12 @@ $('.sortable').sortable({
 });
 
 $('.edit-effect').on('click',function(){
-  $(this).parent().find('form').toggleClass('hidden');    
+  let attr = $(this).attr('hidden');
+  if(typeof attr !== typeof undefined && attr !== false){
+    $(this).parent().find('form').attr('hidden',true);
+  }else{
+    $(this).parent().find('form').removeAttr('hidden');
+  }
 });
 
 var submit_name = '';
@@ -249,11 +242,11 @@ function format_modal_form(){
     });
   });
 }
-$('.toggle-generic-modal').on('click', function(e){
+$('[data-toggle="modal"]').on('click', function(e){
   e.preventDefault();
-  e.preventDefault();
-  $('#generic-modal').removeData('bs.modal');
-  $('#generic-modal .modal-dialog').load($(this).attr('href'),function(response, status, xhr){
+  let target = $($(this).data('target'));
+  target.removeData('bs.modal');
+  target.find('.modal-dialog').load($(this).attr('href'),function(response, status, xhr){
     format_modal_form(); 
   });
 });
