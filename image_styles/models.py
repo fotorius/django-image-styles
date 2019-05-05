@@ -2,6 +2,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from PIL import Image,ImageEnhance,ImageDraw # PIL
+from django.utils.translation import ugettext_lazy as _
 import os,re
 
 def get_upload_file_name(instance,filename):
@@ -36,7 +37,7 @@ class StyleMixin:
         return name
 
 class Style(models.Model):
-    name = models.SlugField(max_length=127,unique=True)
+    name = models.SlugField(_('name'),max_length=127,unique=True)
     
     def delete_images(self):
         ImageStyle.objects.filter(style=self).delete()
@@ -67,9 +68,9 @@ class Style(models.Model):
         ordering = ['id']
 
 class ImageStyle(models.Model):
-    name = models.CharField(max_length=511)
-    style = models.ForeignKey(Style,on_delete=models.CASCADE)
-    image = models.ImageField(upload_to=get_upload_file_name,null=True,blank=True)
+    name = models.CharField(_('name'),max_length=511)
+    style = models.ForeignKey(Style,verbose_name=_('style'),on_delete=models.CASCADE)
+    image = models.ImageField(_('image'),upload_to=get_upload_file_name,null=True,blank=True)
     def __str__(self):
         return "%s - %s" % (self.style.name,self.name)
 
@@ -100,124 +101,7 @@ class ImageStyle(models.Model):
         im.paste(orig)
 
         for effect in effects:
-            if type(effect['object']) is Crop:
-                w, h = im.size
-                if effect['object'].anchor == 1:
-                    box = (0,0,effect['object'].width,effect['object'].height)
-                elif effect['object'].anchor == 2:
-                    box = ((w/2)-(effect['object'].width/2),0,(effect['object'].width/2)+(w/2),effect['object'].height)
-                elif effect['object'].anchor == 3:
-                    box = (w-effect['object'].width,0,w,effect['object'].height)
-                elif effect['object'].anchor == 4:
-                    box = (0,(h/2)-(effect['object'].height/2),effect['object'].width,(effect['object'].height/2)+(h/2))
-                elif effect['object'].anchor == 5:
-                    box = ((w/2)-(effect['object'].width/2),(h/2)-(effect['object'].height/2),(effect['object'].width/2)+(w/2),(effect['object'].height/2)+(h/2))
-                elif effect['object'].anchor == 6:
-                    box = (w-effect['object'].width,(h/2)-(effect['object'].height/2),w,(effect['object'].height/2)+(h/2))
-                elif effect['object'].anchor == 7:
-                    box = (0,h-effect['object'].height,effect['object'].width,h)
-                elif effect['object'].anchor == 8:
-                    box = ((w/2)-(effect['object'].width/2),h-effect['object'].height,(effect['object'].width/2)+(w/2),h)
-                elif effect['object'].anchor == 9:
-                    box = (w-effect['object'].width,h-effect['object'].height,w,h)
-                im = im.crop(box)
-            elif type(effect['object']) is Enhance:
-                
-                if effect['object'].color > 100:
-                    color = 2
-                elif effect['object'].color < -100:
-                    color = 0
-                else:
-                    color = float(effect['object'].color+100)/100
-                converter = ImageEnhance.Color(im)
-                im = converter.enhance(color)
-                
-                if effect['object'].contrast > 100:
-                    contrast = 2
-                elif effect['object'].contrast < -100:
-                    contrast = 0
-                else:
-                    contrast = float(effect['object'].contrast+100)/100
-                converter = ImageEnhance.Contrast(im)
-                im = converter.enhance(contrast)
-                
-                if effect['object'].brightness > 100:
-                    brightness = 2
-                elif effect['object'].brightness < -100:
-                    brightness = 0
-                else:
-                    brightness = float(effect['object'].brightness+100)/100
-                converter = ImageEnhance.Brightness(im)
-                im = converter.enhance(brightness)
-                
-                if effect['object'].sharpness > 100:
-                    sharpness = 2
-                elif effect['object'].sharpness < -100:
-                    sharpness = 0
-                else:
-                    sharpness = float(effect['object'].sharpness+100)/100
-               
-                converter = ImageEnhance.Sharpness(im)
-                im = converter.enhance(sharpness)
-                    
-
-            elif type(effect['object']) is Resize:
-                im = im.resize((effect['object'].width,effect['object'].height))
-            elif type(effect['object']) is Rotate:
-                im = im.rotate(-effect['object'].angle)
-            elif type(effect['object']) is Scale:
-                w, h = im.size
-                if effect['object'].height is None:
-                    width = effect['object'].width
-                    height = int(float(h)/w*width)
-                elif effect['object'].width is None:
-                    height = effect['object'].height
-                    width = int(float(w)/h*height)
-                else:
-                    height = effect['object'].height
-                    width = effect['object'].width
-
-                if effect['object'].allow_upscale:
-                    im = im.resize((width,height),effect['object'].mode)
-                else:
-                    if w > width and h > height:
-                        im = im.resize((width,height),effect['object'].mode)
-
-            elif type(effect['object']) is SmartScale:
-                w, h = im.size
-                im_prop = float(h)/float(w)
-
-                if effect['object'].largest:
-                    if im_prop > 1.0:
-                        width = effect['object'].width
-                        height = int(float(h)/w*width)
-                    else:
-                        height = effect['object'].height
-                        width = int(float(w)/h*height)
-                else:
-                    if im_prop < 1.0:
-                        width = effect['object'].width
-                        height = int(float(h)/w*width)
-                    else:
-                        height = effect['object'].height
-                        width = int(float(w)/h*height)
-
-                if effect['object'].allow_upscale:
-                    im = im.resize((width,height),effect['object'].mode)
-                else:
-                    if w > width and h > height:
-                        im = im.resize((width,height),effect['object'].mode)
-            elif type(effect['object']) is RoundCorners:
-                circle = Image.new('L', (effect['object'].radius * 2, effect['object'].radius * 2), 0)
-                draw = ImageDraw.Draw(circle)
-                draw.ellipse((0, 0, effect['object'].radius * 2, effect['object'].radius * 2), fill=255)
-                alpha = Image.new('L', im.size, "white")
-                w, h = im.size
-                alpha.paste(circle.crop((0, 0, effect['object'].radius, effect['object'].radius)), (0, 0))
-                alpha.paste(circle.crop((0, effect['object'].radius, effect['object'].radius, effect['object'].radius * 2)), (0, h - effect['object'].radius))
-                alpha.paste(circle.crop((effect['object'].radius, 0, effect['object'].radius * 2, effect['object'].radius)), (w - effect['object'].radius, 0))
-                alpha.paste(circle.crop((effect['object'].radius, effect['object'].radius, effect['object'].radius * 2, effect['object'].radius * 2)), (w - effect['object'].radius, h - effect['object'].radius))
-                im.putalpha(alpha)
+            im = effect['object'].render(im)
         
         try:
             im.save(self.image.path)
@@ -250,47 +134,124 @@ class Crop(StyleMixin,models.Model):
         (8,'bottom-center'),
         (9,'bottom-right'),
     )
-    width = models.IntegerField()
-    height = models.IntegerField()
-    anchor = models.IntegerField(choices=ANCHORS,default=5)
-    style = models.ForeignKey(Style,on_delete=models.CASCADE)
-    weight = models.IntegerField(default=0)
+    width = models.IntegerField(_('width'))
+    height = models.IntegerField(_('height'))
+    anchor = models.IntegerField(_('anchor'),choices=ANCHORS,default=5)
+    style = models.ForeignKey(Style,verbose_name=_('style'),on_delete=models.CASCADE)
+    weight = models.IntegerField(_('weight'),default=0)
+
+    def render(self,im):
+        w, h = im.size
+        if self.anchor == 1:
+            box = (0,0,self.width,self.height)
+        elif self.anchor == 2:
+            box = ((w/2)-(self.width/2),0,(self.width/2)+(w/2),self.height)
+        elif self.anchor == 3:
+            box = (w-self.width,0,w,self.height)
+        elif self.anchor == 4:
+            box = (0,(h/2)-(self.height/2),self.width,(self.height/2)+(h/2))
+        elif self.anchor == 5:
+            box = ((w/2)-(self.width/2),(h/2)-(self.height/2),(self.width/2)+(w/2),(self.height/2)+(h/2))
+        elif self.anchor == 6:
+            box = (w-self.width,(h/2)-(self.height/2),w,(self.height/2)+(h/2))
+        elif self.anchor == 7:
+            box = (0,h-self.height,self.width,h)
+        elif self.anchor == 8:
+            box = ((w/2)-(self.width/2),h-self.height,(self.width/2)+(w/2),h)
+        elif self.anchor == 9:
+            box = (w-self.width,h-self.height,w,h)
+        return im.crop(box)
+        
 
 class Enhance(StyleMixin,models.Model):
     CONTRASTS = zip( range(-100,101), range(-100,101) )
     SHARPNESSES = zip( range(-100,101), range(-100,101) )
     BRIGHTNESSES = zip( range(-100,101), range(-100,101) )
     COLORS = zip( range(-100,101), range(-100,101) )
-    contrast = models.IntegerField(choices=CONTRASTS,default=0)
-    brightness = models.IntegerField(choices=BRIGHTNESSES,default=0)
-    color = models.IntegerField(choices=COLORS,default=0)
-    sharpness = models.IntegerField(choices=SHARPNESSES,default=0)
+    contrast = models.IntegerField(_('contrast'),choices=CONTRASTS,default=0)
+    brightness = models.IntegerField(_('brightness'),choices=BRIGHTNESSES,default=0)
+    color = models.IntegerField(_('color'),choices=COLORS,default=0)
+    sharpness = models.IntegerField(_('sharpness'),choices=SHARPNESSES,default=0)
+    style = models.ForeignKey(Style,verbose_name=_('style'),on_delete=models.CASCADE)
+    weight = models.IntegerField(_('weight'),default=0)
 
-    style = models.ForeignKey(Style,on_delete=models.CASCADE)
-    weight = models.IntegerField(default=0)
+    def render(self,im): 
+        if self.color > 100:
+            color = 2
+        elif self.color < -100:
+            color = 0
+        else:
+            color = float(self.color+100)/100
+        converter = ImageEnhance.Color(im)
+        im = converter.enhance(color)
+        
+        if self.contrast > 100:
+            contrast = 2
+        elif self.contrast < -100:
+            contrast = 0
+        else:
+            contrast = float(self.contrast+100)/100
+        converter = ImageEnhance.Contrast(im)
+        im = converter.enhance(contrast)
+        
+        if self.brightness > 100:
+            brightness = 2
+        elif self.brightness < -100:
+            brightness = 0
+        else:
+            brightness = float(self.brightness+100)/100
+        converter = ImageEnhance.Brightness(im)
+        im = converter.enhance(brightness)
+        
+        if self.sharpness > 100:
+            sharpness = 2
+        elif self.sharpness < -100:
+            sharpness = 0
+        else:
+            sharpness = float(self.sharpness+100)/100
+       
+        converter = ImageEnhance.Sharpness(im)
+        im = converter.enhance(sharpness)
 
+        return im
+            
 
 class Resize(StyleMixin,models.Model):
-    width = models.IntegerField()
-    height = models.IntegerField()
+    width = models.IntegerField(_('width'))
+    height = models.IntegerField(_('height'))
+    style = models.ForeignKey(Style,verbose_name=_('style'),on_delete=models.CASCADE)
+    weight = models.IntegerField(_('weight'),default=0)
 
-    style = models.ForeignKey(Style,on_delete=models.CASCADE)
-    weight = models.IntegerField(default=0)
-
+    def render(self,im):
+        return im.resize((self.width,self.height))
+        
 
 class RoundCorners(StyleMixin,models.Model):
-    radius = models.IntegerField()
-    style = models.ForeignKey(Style,on_delete=models.CASCADE)
-    weight = models.IntegerField(default=0)
+    radius = models.IntegerField(_('radius'))
+    style = models.ForeignKey(Style,verbose_name=_('style'),on_delete=models.CASCADE)
+    weight = models.IntegerField(_('weight'),default=0)
 
+    def render(self,im):
+        circle = Image.new('L', (self.radius * 2, self.radius * 2), 0)
+        draw = ImageDraw.Draw(circle)
+        draw.ellipse((0, 0, self.radius * 2, self.radius * 2), fill=255)
+        alpha = Image.new('L', im.size, "white")
+        w, h = im.size
+        alpha.paste(circle.crop((0, 0, self.radius, self.radius)), (0, 0))
+        alpha.paste(circle.crop((0, self.radius, self.radius, self.radius * 2)), (0, h - self.radius))
+        alpha.paste(circle.crop((self.radius, 0, self.radius * 2, self.radius)), (w - self.radius, 0))
+        alpha.paste(circle.crop((self.radius, self.radius, self.radius * 2, self.radius * 2)), (w - self.radius, h - self.radius))
+        im.putalpha(alpha)
+        return im
 
 class Rotate(StyleMixin,models.Model):
     ANGLES = zip( range(90,360,90), range(90,360,90) )
-    angle = models.IntegerField(choices=ANGLES,default=0)
+    angle = models.IntegerField(_('angle'),choices=ANGLES,default=0)
+    style = models.ForeignKey(Style,verbose_name=_('style'),on_delete=models.CASCADE)
+    weight = models.IntegerField(_('weight'),default=0)
 
-    style = models.ForeignKey(Style,on_delete=models.CASCADE)
-    weight = models.IntegerField(default=0)
-
+    def render(self,im):
+        return im.rotate(-self.angle)
 
 class Scale(StyleMixin,models.Model):
     MODES = (
@@ -299,14 +260,31 @@ class Scale(StyleMixin,models.Model):
         (Image.BILINEAR,'Bilinear'),
         (Image.BICUBIC,'Bicubic'),
     )
-    mode = models.PositiveSmallIntegerField(choices=MODES,default=1)
-    width = models.IntegerField(blank=True,null=True)
-    height = models.IntegerField(blank=True,null=True)
-    allow_upscale = models.BooleanField(default=True)
+    mode = models.PositiveSmallIntegerField(_('mode'),choices=MODES,default=1)
+    width = models.IntegerField(_('width'),blank=True,null=True)
+    height = models.IntegerField(_('height'),blank=True,null=True)
+    allow_upscale = models.BooleanField(_('allow_upscale'),default=True)
+    style = models.ForeignKey(Style,verbose_name=_('style'),on_delete=models.CASCADE)
+    weight = models.IntegerField(_('weight'),default=0)
 
-    style = models.ForeignKey(Style,on_delete=models.CASCADE)
-    weight = models.IntegerField(default=0)
+    def render(self,im):
+        w, h = im.size
+        if self.height is None:
+            width = self.width
+            height = int(float(h)/w*width)
+        elif self.width is None:
+            height = self.height
+            width = int(float(w)/h*height)
+        else:
+            height = self.height
+            width = self.width
 
+        if self.allow_upscale:
+            im = im.resize((width,height),self.mode)
+        else:
+            if w > width and h > height:
+                im = im.resize((width,height),self.mode)
+        return im
 
 
 class SmartScale(StyleMixin,models.Model):
@@ -316,12 +294,37 @@ class SmartScale(StyleMixin,models.Model):
         (Image.BILINEAR,'Bilinear'),
         (Image.BICUBIC,'Bicubic'),
     )
-    mode = models.PositiveSmallIntegerField(choices=MODES,default=1)
-    width = models.IntegerField()
-    height = models.IntegerField()
-    allow_upscale = models.BooleanField(default=True)
-    largest = models.BooleanField(help_text=('Constraint by largest dimension.'),default=True)
+    mode = models.PositiveSmallIntegerField(_('mode'),choices=MODES,default=1)
+    width = models.IntegerField(_('width'))
+    height = models.IntegerField(_('height'))
+    allow_upscale = models.BooleanField(_('allow_upscale'),default=True)
+    largest = models.BooleanField(_('largest'),help_text=('Constraint by largest dimension.'),default=True)
+    style = models.ForeignKey(Style,verbose_name=_('style'),on_delete=models.CASCADE)
+    weight = models.IntegerField(_('weight'),default=0)
 
-    style = models.ForeignKey(Style,on_delete=models.CASCADE)
-    weight = models.IntegerField(default=0)
 
+    def render(self,im):
+        w, h = im.size
+        im_prop = float(h)/float(w)
+
+        if self.largest:
+            if im_prop > 1.0:
+                width = self.width
+                height = int(float(h)/w*width)
+            else:
+                height = self.height
+                width = int(float(w)/h*height)
+        else:
+            if im_prop < 1.0:
+                width = self.width
+                height = int(float(h)/w*width)
+            else:
+                height = self.height
+                width = int(float(w)/h*height)
+
+        if self.allow_upscale:
+            im = im.resize((width,height),self.mode)
+        else:
+            if w > width and h > height:
+                im = im.resize((width,height),self.mode)
+        return im

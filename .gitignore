@@ -43,6 +43,9 @@ nosetests.xml
 coverage.xml
 *,cover
 
+# SASS
+.sass-cache/
+
 # Translations
 *.mo
 *.pot
