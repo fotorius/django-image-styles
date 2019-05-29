@@ -62,10 +62,10 @@ class Style(models.Model):
         return effects
 
     def __str__(self):
-        return '%d: %s' % (self.id,self.name)
+        return self.name
 
     class Meta:
-        ordering = ['id']
+        ordering = ('name',)
 
 class ImageStyle(models.Model):
     name = models.CharField(_('name'),max_length=511)
@@ -176,42 +176,46 @@ class Enhance(StyleMixin,models.Model):
     weight = models.IntegerField(_('weight'),default=0)
 
     def render(self,im): 
-        if self.color > 100:
-            color = 2
-        elif self.color < -100:
-            color = 0
-        else:
-            color = float(self.color+100)/100
-        converter = ImageEnhance.Color(im)
-        im = converter.enhance(color)
+        if self.color:
+            if self.color > 100:
+                color = 2
+            elif self.color < -100:
+                color = 0
+            else:
+                color = float(self.color+100)/100
+            converter = ImageEnhance.Color(im)
+            im = converter.enhance(color)
         
-        if self.contrast > 100:
-            contrast = 2
-        elif self.contrast < -100:
-            contrast = 0
-        else:
-            contrast = float(self.contrast+100)/100
-        converter = ImageEnhance.Contrast(im)
-        im = converter.enhance(contrast)
+        if self.contrast:
+            if self.contrast > 100:
+                contrast = 2
+            elif self.contrast < -100:
+                contrast = 0
+            else:
+                contrast = float(self.contrast+100)/100
+            converter = ImageEnhance.Contrast(im)
+            im = converter.enhance(contrast)
         
-        if self.brightness > 100:
-            brightness = 2
-        elif self.brightness < -100:
-            brightness = 0
-        else:
-            brightness = float(self.brightness+100)/100
-        converter = ImageEnhance.Brightness(im)
-        im = converter.enhance(brightness)
+        if self.brightness:
+            if self.brightness > 100:
+                brightness = 2
+            elif self.brightness < -100:
+                brightness = 0
+            else:
+                brightness = float(self.brightness+100)/100
+            converter = ImageEnhance.Brightness(im)
+            im = converter.enhance(brightness)
         
-        if self.sharpness > 100:
-            sharpness = 2
-        elif self.sharpness < -100:
-            sharpness = 0
-        else:
-            sharpness = float(self.sharpness+100)/100
-       
-        converter = ImageEnhance.Sharpness(im)
-        im = converter.enhance(sharpness)
+        if self.sharpness:
+            if self.sharpness > 100:
+                sharpness = 2
+            elif self.sharpness < -100:
+                sharpness = 0
+            else:
+                sharpness = float(self.sharpness+100)/100
+
+            converter = ImageEnhance.Sharpness(im)
+            im = converter.enhance(sharpness)
 
         return im
             
@@ -306,16 +310,17 @@ class SmartScale(StyleMixin,models.Model):
     def render(self,im):
         w, h = im.size
         im_prop = float(h)/float(w)
+        scale_prop = self.width/self.height
 
         if self.largest:
-            if im_prop > 1.0:
+            if im_prop > scale_prop:
                 width = self.width
                 height = int(float(h)/w*width)
             else:
                 height = self.height
                 width = int(float(w)/h*height)
         else:
-            if im_prop < 1.0:
+            if im_prop < scale_prop:
                 width = self.width
                 height = int(float(h)/w*width)
             else:

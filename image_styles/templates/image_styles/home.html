@@ -19,7 +19,7 @@
 
       <div class="container">
 {% for s in styles %}
-    <div class="row"><div class="col-sm-6 offset-sm-3">
+    <div class="row"><div class="col-sm-6 offset-sm-3 mt-3">
       <h2 class="style-title"><span class="style-name">{{s.style}}</span><a href="{% url 'image_styles:style_update' s.style.id %}" data-toggle="modal" data-target="#generic-modal"><i class="fa fa-pencil"></i></a><a class="ml-auto" href="{% url 'image_styles:effect_create_init' s.style.id %}" data-toggle="modal" data-target="#generic-modal"><i class="fa fa-plus"></i></a></h2>
     </div></div>
     <div class="row effects"><div class="loading"></div><div class="col-sm-6 offset-sm-3 sortable">
