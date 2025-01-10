@@ -90,3 +90,4 @@ If a style is modified in any way, it will be resetted and the new images will b
 - Since the system has no way of telling if the original images have been deleted or modified, the rendered images can still be shown if the right url is called. The way of preventing this (and the *correct* thing to do) is to rename the file if the image object has changed.
 - Images with no alpha channels may be filled with a black background.
 - The latest version of this software will only work with local files, I haven't work on the _bucket_ implementation yet.
+
